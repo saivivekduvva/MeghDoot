@@ -53,16 +53,19 @@ async def simulate_scenario(payload: schemas.ScenarioInput, db: Session = Depend
         {"agent_name": "Weather Agent", "reasoning": final_state.get("weather_analysis", "")},
         {"agent_name": "Flood Agent", "reasoning": final_state.get("flood_analysis", "")},
         {"agent_name": "Infrastructure Agent", "reasoning": final_state.get("infrastructure_analysis", "")},
+        {"agent_name": "Economics Agent", "reasoning": final_state.get("economic_analysis", "")},
         {"agent_name": "Verification Agent", "reasoning": final_state.get("verification_report", "")}
     ]
     
     actions = mayor_report.get("recommended_actions", [])
+    allocations = mayor_report.get("relief_allocations", [])
     
     report = schemas.CityRiskReport(
         metrics=metrics,
         agent_reasoning=agent_reasoning,
         recommended_actions=actions,
-        expected_impact_reduction=mayor_report.get("expected_impact_reduction", {})
+        expected_impact_reduction=mayor_report.get("expected_impact_reduction", {}),
+        relief_allocations=allocations
     )
     
     # Normally we'd save the outputs back to models.RiskAssessment and models.AgentOutput

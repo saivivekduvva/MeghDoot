@@ -30,12 +30,17 @@ class ActionRecommendation(BaseModel):
     action_text: str
     priority_level: str
 
+class ReliefAllocation(BaseModel):
+    category: str
+    amount_crores: float
+
 # Expected output format for the API response
 class CityRiskReport(BaseModel):
     metrics: RiskMetrics
     agent_reasoning: List[AgentAnalysis]
     recommended_actions: List[ActionRecommendation]
     expected_impact_reduction: dict
+    relief_allocations: List[ReliefAllocation]
 
 # Citizen SOS reporting models
 class SOSReportInput(BaseModel):

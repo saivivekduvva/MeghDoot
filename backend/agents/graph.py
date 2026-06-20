@@ -4,6 +4,7 @@ from .nodes import (
     run_weather_agent,
     run_flood_agent,
     run_infrastructure_agent,
+    run_economics_agent,
     run_verification_agent,
     run_mayor_agent
 )
@@ -15,6 +16,7 @@ workflow = StateGraph(AgentState)
 workflow.add_node("weather", run_weather_agent)
 workflow.add_node("flood", run_flood_agent)
 workflow.add_node("infrastructure", run_infrastructure_agent)
+workflow.add_node("economics", run_economics_agent)
 workflow.add_node("verification", run_verification_agent)
 workflow.add_node("mayor", run_mayor_agent)
 
@@ -22,7 +24,8 @@ workflow.add_node("mayor", run_mayor_agent)
 # Weather -> Flood -> Infrastructure -> Verification -> Mayor -> END
 workflow.add_edge("weather", "flood")
 workflow.add_edge("flood", "infrastructure")
-workflow.add_edge("infrastructure", "verification")
+workflow.add_edge("infrastructure", "economics")
+workflow.add_edge("economics", "verification")
 workflow.add_edge("verification", "mayor")
 workflow.add_edge("mayor", END)
 

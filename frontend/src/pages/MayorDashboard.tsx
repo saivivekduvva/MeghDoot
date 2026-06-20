@@ -1,5 +1,5 @@
 import { useReport } from '../ReportContext';
-import { ShieldCheck, ArrowDownRight, AlertOctagon } from 'lucide-react';
+import { ShieldCheck, ArrowDownRight, AlertOctagon, Coins } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const pageVariants = {
@@ -94,6 +94,26 @@ export default function MayorDashboard() {
                 <h4 className="font-bold text-orange-800">Est. Economic Loss</h4>
                 <p className="text-orange-900 mt-1 font-semibold text-xl">₹{metrics.economic_loss_estimate.toFixed(2)} Crores</p>
               </div>
+            </div>
+          </div>
+
+          <div className="bg-emerald-50 border border-emerald-200 p-5 rounded-xl shadow-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-emerald-100 rounded-lg">
+                <Coins className="w-5 h-5 text-emerald-600" />
+              </div>
+              <h4 className="font-bold text-emerald-800">Relief Allocation</h4>
+            </div>
+            <div className="space-y-3">
+              {report.relief_allocations?.map((alloc, idx) => (
+                <div key={idx} className="flex justify-between items-center text-sm">
+                  <span className="text-emerald-700 font-medium">{alloc.category}</span>
+                  <span className="text-emerald-900 font-bold bg-emerald-200/50 px-2 py-1 rounded">₹{alloc.amount_crores.toFixed(2)} Cr</span>
+                </div>
+              ))}
+              {(!report.relief_allocations || report.relief_allocations.length === 0) && (
+                <p className="text-sm text-emerald-700/60">No allocations suggested.</p>
+              )}
             </div>
           </div>
         </div>

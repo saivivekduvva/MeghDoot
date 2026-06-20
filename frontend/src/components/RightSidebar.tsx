@@ -1,11 +1,12 @@
 
 import { motion } from 'framer-motion';
-import { CloudRain, Waves, ThermometerSun, ShieldAlert, Navigation, Plus, Zap, X } from 'lucide-react';
+import { CloudRain, Waves, ThermometerSun, ShieldAlert, Navigation, Plus, Zap, X, PieChart } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const agents = [
   { name: 'Weather Agent', status: 'active', icon: CloudRain, color: 'text-blue-400', bg: 'bg-blue-500/10' },
   { name: 'Flood Agent', status: 'computing', icon: Waves, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
+  { name: 'Economics Agent', status: 'computing', icon: PieChart, color: 'text-purple-400', bg: 'bg-purple-500/10' },
   { name: 'Heatwave Agent', status: 'standby', icon: ThermometerSun, color: 'text-amber-400', bg: 'bg-amber-500/10' },
   { name: 'Evacuation Agent', status: 'active', icon: Navigation, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
 ];

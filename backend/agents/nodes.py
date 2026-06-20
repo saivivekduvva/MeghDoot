@@ -92,6 +92,32 @@ def run_infrastructure_agent(state: AgentState) -> Dict[str, Any]:
         
     return {"infrastructure_analysis": analysis, "infrastructure_risk": risk}
 
+def run_economics_agent(state: AgentState) -> Dict[str, Any]:
+    scenario = state.get("scenario", {})
+    infrastructure_risk = state.get("infrastructure_risk", 0.0)
+    pop_density = scenario.get("population_density_multiplier", 1.0)
+    
+    try:
+        if not os.environ.get("GOOGLE_API_KEY") or "your_google_api_key" in os.environ.get("GOOGLE_API_KEY", ""):
+            raise ValueError("Placeholder API key")
+            
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", "You are the Economics Agent. Assess economic and crop loss based on infrastructure risk ({infrastructure_risk}%). Output exactly two lines:\nLine 1: Reasoning.\nLine 2: Risk Percentage."),
+            ("user", "Scenario: {scenario}")
+        ])
+        chain = prompt | llm
+        response = chain.invoke({"scenario": str(scenario), "infrastructure_risk": infrastructure_risk}).content
+        
+        lines = response.strip().split("\n")
+        analysis = lines[0] if len(lines) > 0 else "Analysis failed."
+        risk = float(lines[-1].strip().replace('%', '')) if len(lines) > 1 else 0.0
+    except Exception as e:
+        print(f"[Economics Agent] Falling back to simulation due to LLM error: {e}")
+        risk = min(100.0, max(0.0, infrastructure_risk * 0.9 * pop_density))
+        analysis = f"[Simulation Mode] Economic stress index is {risk:.1f}%. Anticipating significant crop yield reduction and infrastructure repair costs."
+        
+    return {"economic_analysis": analysis, "economic_risk": risk}
+
 def run_verification_agent(state: AgentState) -> Dict[str, Any]:
     # In a real scenario, this would cross-check data.
     # For now, we simulate a confidence score based on consistency.
@@ -104,6 +130,7 @@ def run_mayor_agent(state: AgentState) -> Dict[str, Any]:
     w = state.get("weather_risk", 0.0)
     f = state.get("flood_risk", 0.0)
     i = state.get("infrastructure_risk", 0.0)
+    e = state.get("economic_risk", 0.0)
     pop_density = scenario.get("population_density_multiplier", 1.0)
     
     try:
@@ -122,10 +149,13 @@ def run_mayor_agent(state: AgentState) -> Dict[str, Any]:
   }},
   "affected_population": 10000,
   "economic_loss_estimate": 100.5,
-  "hospital_demand_increase_pct": 10.0
+  "hospital_demand_increase_pct": 10.0,
+  "relief_allocations": [
+    {{"category": "Crop Subsidies", "amount_crores": 2.5}}
+  ]
 }}
 Base your numbers on the input risks:
-Weather: {w}%, Flood: {f}%, Infrastructure: {i}%
+Weather: {w}%, Flood: {f}%, Infrastructure: {i}%, Economic: {e}%
 """),
             ("user", "Generate report.")
         ])
@@ -133,7 +163,8 @@ Weather: {w}%, Flood: {f}%, Infrastructure: {i}%
         response = chain.invoke({
             "w": w,
             "f": f,
-            "i": i
+            "i": i,
+            "e": e
         }).content
         
         import json
@@ -171,7 +202,12 @@ Weather: {w}%, Flood: {f}%, Infrastructure: {i}%
             },
             "affected_population": affected_pop,
             "economic_loss_estimate": econ_loss,
-            "hospital_demand_increase_pct": hosp_demand
+            "hospital_demand_increase_pct": hosp_demand,
+            "relief_allocations": [
+                {"category": "Infrastructure Repair", "amount_crores": round(econ_loss * 0.4, 2)},
+                {"category": "Crop Subsidies", "amount_crores": round(econ_loss * 0.35, 2)},
+                {"category": "Emergency Medical Funds", "amount_crores": round(econ_loss * 0.25, 2)}
+            ]
         }
         
     return {"mayor_report": data}

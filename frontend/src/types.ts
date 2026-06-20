@@ -24,9 +24,15 @@ export interface ExpectedImpactReduction {
   economic_loss_reduced_pct?: number;
 }
 
+export interface ReliefAllocation {
+  category: string;
+  amount_crores: number;
+}
+
 export interface CityRiskReport {
   metrics: RiskMetrics;
   agent_reasoning: AgentAnalysis[];
   recommended_actions: ActionRecommendation[];
   expected_impact_reduction: ExpectedImpactReduction;
+  relief_allocations: ReliefAllocation[];
 }
