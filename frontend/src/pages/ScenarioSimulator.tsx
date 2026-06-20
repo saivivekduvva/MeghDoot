@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useReport } from '../ReportContext';
 import { PlayCircle, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -8,12 +8,19 @@ import { motion } from 'framer-motion';
 export default function ScenarioSimulator() {
   const { setReport, isLoading, setIsLoading } = useReport();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    rainfall_mm: 120,
-    temperature_c: 38.5,
-    reservoir_capacity_pct: 45,
-    population_density_multiplier: 1.2
+  const [formData, setFormData] = useState(() => {
+    const saved = localStorage.getItem('meghdoot_simulator_form');
+    return saved ? JSON.parse(saved) : {
+      rainfall_mm: 120,
+      temperature_c: 38.5,
+      reservoir_capacity_pct: 45,
+      population_density_multiplier: 1.2
+    };
   });
+
+  useEffect(() => {
+    localStorage.setItem('meghdoot_simulator_form', JSON.stringify(formData));
+  }, [formData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({

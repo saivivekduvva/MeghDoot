@@ -1,6 +1,6 @@
 
 import { motion } from 'framer-motion';
-import { CloudRain, Waves, ThermometerSun, ShieldAlert, Navigation, Plus, Zap } from 'lucide-react';
+import { CloudRain, Waves, ThermometerSun, ShieldAlert, Navigation, Plus, Zap, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const agents = [
@@ -16,16 +16,27 @@ const actions = [
   { id: 3, title: 'Medical Supply Drop', location: 'Sector 4', priority: 'MEDIUM', icon: Plus, color: 'blue' },
 ];
 
-const RightSidebar = () => {
+const RightSidebar = ({ onClose }: { onClose?: () => void }) => {
   return (
     <motion.div 
-      initial={{ opacity: 0, x: 20 }}
+      initial={{ opacity: 0, x: 350 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5, delay: 0.3 }}
-      className="w-80 flex flex-col gap-6 ml-6 shrink-0"
+      exit={{ opacity: 0, x: 350 }}
+      transition={{ duration: 0.4, type: "spring", bounce: 0 }}
+      className="absolute top-6 right-6 bottom-6 w-80 flex flex-col gap-6 z-50"
     >
+      {onClose && (
+        <button 
+          onClick={onClose}
+          className="absolute -left-14 top-4 p-3 bg-white text-slate-500 hover:text-slate-900 rounded-full shadow-2xl border border-slate-100 transition-all hover:scale-110 z-50"
+          title="Close AI Panel"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      )}
+
       {/* AI Telemetry */}
-      <div className="glass-panel p-6 flex-1">
+      <div className="glass-panel p-6 flex-1 shadow-2xl backdrop-blur-2xl bg-white/95">
         <h3 className="text-lg font-bold text-slate-900 mb-6">AI Telemetry</h3>
         <div className="space-y-4">
           {agents.map((agent, idx) => (
@@ -58,7 +69,7 @@ const RightSidebar = () => {
       </div>
 
       {/* Action Center */}
-      <div className="glass-panel p-6 flex-1">
+      <div className="glass-panel p-6 flex-1 shadow-2xl backdrop-blur-2xl bg-white/95">
         <h3 className="text-lg font-bold text-slate-900 mb-6">Critical Actions</h3>
         <div className="space-y-4">
           {actions.map((action, idx) => (

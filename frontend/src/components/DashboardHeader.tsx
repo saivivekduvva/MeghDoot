@@ -1,8 +1,10 @@
 
-import { Search, Bell, User } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { Search, Bell, User, LogOut, Settings as SettingsIcon, UserCircle, PanelRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const DashboardHeader = () => {
+const DashboardHeader = ({ toggleRightSidebar }: { toggleRightSidebar?: () => void }) => {
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   return (
     <motion.div 
       initial={{ opacity: 0, y: -20 }}
@@ -39,14 +41,64 @@ const DashboardHeader = () => {
           <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
         </motion.button>
 
-        <motion.div 
+        <motion.button 
+          onClick={toggleRightSidebar}
           whileHover={{ scale: 1.05 }}
-          className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 p-[2px] cursor-pointer"
+          whileTap={{ scale: 0.95 }}
+          className="p-2.5 glass-card rounded-full text-slate-600 hover:text-slate-900"
+          title="Toggle AI Telemetry Panel"
         >
-          <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
-            <User className="w-5 h-5 text-slate-600" />
-          </div>
-        </motion.div>
+          <PanelRight className="w-5 h-5" />
+        </motion.button>
+
+        <div className="relative">
+          <motion.div 
+            whileHover={{ scale: 1.05 }}
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 p-[2px] cursor-pointer"
+          >
+            <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
+              <User className="w-5 h-5 text-slate-600" />
+            </div>
+          </motion.div>
+
+          <AnimatePresence>
+            {isProfileOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                transition={{ duration: 0.15 }}
+                className="absolute right-0 mt-3 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 py-2 z-50 overflow-hidden"
+              >
+                <div className="px-4 py-3 border-b border-slate-100/80 mb-1">
+                  <p className="text-sm font-bold text-slate-800">Commander Admin</p>
+                  <p className="text-xs font-medium text-slate-500 mt-0.5">admin@meghdoot.gov</p>
+                </div>
+                <button 
+                  onClick={() => setIsProfileOpen(false)}
+                  className="w-full px-4 py-2.5 text-left text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-colors flex items-center gap-2"
+                >
+                  <UserCircle className="w-4 h-4" /> My Profile
+                </button>
+                <button 
+                  onClick={() => setIsProfileOpen(false)}
+                  className="w-full px-4 py-2.5 text-left text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-colors flex items-center gap-2"
+                >
+                  <SettingsIcon className="w-4 h-4" /> Account Settings
+                </button>
+                <div className="border-t border-slate-100 mt-1 pt-1">
+                  <button 
+                    onClick={() => setIsProfileOpen(false)}
+                    className="w-full px-4 py-2.5 text-left text-sm font-bold text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" /> Sign Out
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </motion.div>
   );

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { CityRiskReport } from './types';
 
 // Mock initial data
@@ -28,8 +28,15 @@ interface ReportContextType {
 const ReportContext = createContext<ReportContextType | undefined>(undefined);
 
 export function ReportProvider({ children }: { children: React.ReactNode }) {
-  const [report, setReport] = useState<CityRiskReport>(defaultReport);
+  const [report, setReport] = useState<CityRiskReport>(() => {
+    const saved = localStorage.getItem('meghdoot_report');
+    return saved ? JSON.parse(saved) : defaultReport;
+  });
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('meghdoot_report', JSON.stringify(report));
+  }, [report]);
 
   return (
     <ReportContext.Provider value={{ report, setReport, isLoading, setIsLoading }}>
