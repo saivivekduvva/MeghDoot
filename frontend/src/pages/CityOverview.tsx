@@ -1,5 +1,6 @@
 import { useReport } from '../ReportContext';
 import { ShieldCheck, ShieldAlert, AlertTriangle } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function CityOverview() {
   const { report } = useReport();
@@ -29,7 +30,13 @@ export default function CityOverview() {
   };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-8">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+      className="p-8 max-w-6xl mx-auto space-y-8"
+    >
       <header>
         <h2 className="text-3xl font-bold text-slate-800">City Climate Overview</h2>
         <p className="text-slate-500 mt-2">Real-time predictive insights powered by multi-agent AI.</p>
@@ -50,12 +57,14 @@ export default function CityOverview() {
           </div>
         </div>
         <div className="w-full bg-slate-100 rounded-full h-4 overflow-hidden">
-          <div 
-            className="bg-blue-600 h-4 transition-all duration-1000 ease-out" 
-            style={{ width: `${metrics.confidence_score_pct}%` }} 
+          <motion.div 
+            initial={{ width: 0 }}
+            animate={{ width: `${metrics.confidence_score_pct}%` }}
+            transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+            className="bg-blue-600 h-4" 
           />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

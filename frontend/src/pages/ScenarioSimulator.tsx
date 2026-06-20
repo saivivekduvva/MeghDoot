@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { useReport } from '../ReportContext';
 import { PlayCircle, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 
 export default function ScenarioSimulator() {
   const { setReport, isLoading, setIsLoading } = useReport();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     rainfall_mm: 120,
     temperature_c: 38.5,
@@ -20,6 +24,7 @@ export default function ScenarioSimulator() {
 
   const runSimulation = async () => {
     setIsLoading(true);
+    const toastId = toast.loading('Agents analyzing scenario...');
     try {
       const response = await fetch('http://127.0.0.1:8000/simulate-scenario', {
         method: 'POST',
@@ -29,20 +34,27 @@ export default function ScenarioSimulator() {
       if (response.ok) {
         const data = await response.json();
         setReport(data);
-        alert('Simulation Complete! Check the Dashboard for insights.');
+        toast.success('Simulation Complete!', { id: toastId });
+        setTimeout(() => navigate('/mayor'), 600);
       } else {
-        alert('Simulation failed.');
+        toast.error('Simulation failed.', { id: toastId });
       }
     } catch (err) {
       console.error(err);
-      alert('Error connecting to backend.');
+      toast.error('Error connecting to backend.', { id: toastId });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+      className="p-8 max-w-4xl mx-auto"
+    >
       <header className="mb-8">
         <h2 className="text-3xl font-bold text-slate-800">Scenario Simulator</h2>
         <p className="text-slate-500 mt-2">Inject parameters and trigger the multi-agent AI engine.</p>
@@ -85,6 +97,6 @@ export default function ScenarioSimulator() {
           {isLoading ? 'Agents Analyzing...' : 'Run Scenario'}
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }

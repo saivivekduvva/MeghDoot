@@ -6,7 +6,7 @@ from .state import AgentState
 
 # Setup the LLM. Requires GOOGLE_API_KEY environment variable.
 # For local dev, make sure to load it via dotenv or pass it in.
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0.2)
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.2)
 
 def run_weather_agent(state: AgentState) -> Dict[str, Any]:
     prompt = ChatPromptTemplate.from_messages([

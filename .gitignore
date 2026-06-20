@@ -41,6 +41,7 @@ venv.bak/
 ENV/
 .pytest_cache/
 *.sqlite3
+*.db
 
 # Node / Frontend
 node_modules/

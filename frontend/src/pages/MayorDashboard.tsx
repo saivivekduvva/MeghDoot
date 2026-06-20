@@ -1,5 +1,25 @@
 import { useReport } from '../ReportContext';
 import { ShieldCheck, ArrowDownRight, AlertOctagon } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const pageVariants = {
+  initial: { opacity: 0, y: 20 },
+  in: { opacity: 1, y: 0 },
+  out: { opacity: 0, y: -20 }
+};
+
+const listVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  show: { opacity: 1, x: 0 }
+};
 
 export default function MayorDashboard() {
   const { report } = useReport();
@@ -7,14 +27,20 @@ export default function MayorDashboard() {
 
   if (!recommended_actions || recommended_actions.length === 0) {
     return (
-      <div className="p-8 flex items-center justify-center h-full text-slate-500">
+      <motion.div 
+        initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
+        className="p-8 flex items-center justify-center h-full text-slate-500"
+      >
         Run a simulation to generate the Mayor's Action Plan.
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-8">
+    <motion.div 
+      initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
+      className="p-8 max-w-5xl mx-auto space-y-8"
+    >
       <header className="mb-8 flex justify-between items-end">
         <div>
           <h2 className="text-3xl font-bold text-slate-800">Executive Action Plan</h2>
@@ -27,12 +53,12 @@ export default function MayorDashboard() {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="col-span-2 space-y-4">
+        <motion.div variants={listVariants} initial="hidden" animate="show" className="col-span-2 space-y-4">
           <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
             <ShieldCheck className="w-6 h-6 text-green-600" /> Recommended Actions
           </h3>
           {recommended_actions.map((action, idx) => (
-            <div key={idx} className={`p-5 rounded-xl border flex items-center justify-between shadow-sm bg-white ${action.priority_level === 'CRITICAL' ? 'border-red-300' : 'border-slate-200'}`}>
+            <motion.div variants={itemVariants} key={idx} className={`p-5 rounded-xl border flex items-center justify-between shadow-sm bg-white ${action.priority_level === 'CRITICAL' ? 'border-red-300' : 'border-slate-200'}`}>
               <div className="flex items-center gap-4">
                 <div className="font-bold text-lg text-slate-400 w-6">{idx + 1}.</div>
                 <p className="text-slate-800 font-medium">{action.action_text}</p>
@@ -40,9 +66,9 @@ export default function MayorDashboard() {
               <span className={`text-xs font-bold px-3 py-1 rounded-full ${action.priority_level === 'CRITICAL' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'}`}>
                 {action.priority_level}
               </span>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         <div className="space-y-6">
           <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-lg">
@@ -72,6 +98,6 @@ export default function MayorDashboard() {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

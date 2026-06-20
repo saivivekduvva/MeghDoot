@@ -1,6 +1,7 @@
 import { useReport } from '../ReportContext';
 import { MapContainer, TileLayer, Circle, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { motion } from 'framer-motion';
 
 export default function RiskMapPage() {
   const { report } = useReport();
@@ -23,7 +24,13 @@ export default function RiskMapPage() {
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+      className="h-full flex flex-col"
+    >
       <div className="p-6 bg-white border-b border-slate-200 z-10">
         <h2 className="text-2xl font-bold text-slate-800">GIS Risk Map</h2>
         <p className="text-sm text-slate-500">Interactive visualization of vulnerable regions based on current simulation.</p>
@@ -54,6 +61,6 @@ export default function RiskMapPage() {
           ))}
         </MapContainer>
       </div>
-    </div>
+    </motion.div>
   );
 }

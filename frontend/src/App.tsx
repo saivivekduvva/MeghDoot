@@ -1,5 +1,7 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Activity, Map, Cpu, ShieldAlert, Sliders } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+import { Toaster } from 'react-hot-toast';
 import CityOverview from './pages/CityOverview';
 import RiskMapPage from './pages/RiskMapPage';
 import AgentIntelligence from './pages/AgentIntelligence';
@@ -42,18 +44,28 @@ function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function AnimatedRoutes() {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<CityOverview />} />
+        <Route path="/risk-map" element={<RiskMapPage />} />
+        <Route path="/agents" element={<AgentIntelligence />} />
+        <Route path="/mayor" element={<MayorDashboard />} />
+        <Route path="/simulate" element={<ScenarioSimulator />} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
 function App() {
   return (
     <Router>
       <Layout>
-        <Routes>
-          <Route path="/" element={<CityOverview />} />
-          <Route path="/risk-map" element={<RiskMapPage />} />
-          <Route path="/agents" element={<AgentIntelligence />} />
-          <Route path="/mayor" element={<MayorDashboard />} />
-          <Route path="/simulate" element={<ScenarioSimulator />} />
-        </Routes>
+        <AnimatedRoutes />
       </Layout>
+      <Toaster position="top-right" />
     </Router>
   );
 }
