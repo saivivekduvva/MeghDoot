@@ -13,8 +13,12 @@ const DashboardHeader = ({ toggleRightSidebar }: { toggleRightSidebar?: () => vo
       className="flex justify-between items-center mb-8"
     >
       <div>
-        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Welcome, Commander</h1>
-        <p className="text-slate-500 mt-1 flex items-center gap-2">
+        <div className="flex items-center gap-3 mb-1">
+          <h1 className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 tracking-tight">MeghDoot</h1>
+          <span className="text-slate-300 text-3xl font-light">|</span>
+          <h2 className="text-xl font-bold text-slate-700 tracking-tight mt-1">Command Center</h2>
+        </div>
+        <p className="text-slate-500 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           System is monitoring 3 active risk scenarios
         </p>
