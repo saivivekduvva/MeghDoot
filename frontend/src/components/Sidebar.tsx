@@ -1,5 +1,5 @@
 
-import { Home, CloudRain, AlertTriangle, Activity, Settings, Hexagon, ShieldCheck } from 'lucide-react';
+import { Home, CloudRain, AlertTriangle, Activity, Settings, Hexagon, ShieldCheck, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -13,6 +13,7 @@ const Sidebar = () => {
     { icon: AlertTriangle, label: 'Risk Map', path: '/risk-map' },
     { icon: Activity, label: 'Telemetry', path: '/telemetry' },
     { icon: ShieldCheck, label: 'Action Plan', path: '/mayor' },
+    { icon: Users, label: 'Citizen SOS', path: '/citizen-reports' },
   ];
 
   return (

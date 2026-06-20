@@ -36,3 +36,14 @@ class CityRiskReport(BaseModel):
     agent_reasoning: List[AgentAnalysis]
     recommended_actions: List[ActionRecommendation]
     expected_impact_reduction: dict
+
+# Citizen SOS reporting models
+class SOSReportInput(BaseModel):
+    location: str
+    description: str
+    image_url: Optional[str] = None
+
+class SOSReportResponse(BaseModel):
+    status: str
+    reasoning: str
+    confidence_score: float

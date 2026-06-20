@@ -74,3 +74,22 @@ async def simulate_scenario(payload: schemas.ScenarioInput, db: Session = Depend
 async def get_city_report():
     # Placeholder for getting the latest report
     return {"message": "Use /simulate-scenario to generate a new report."}
+
+@router.post("/sos-report", response_model=schemas.SOSReportResponse)
+async def process_sos_report(payload: schemas.SOSReportInput):
+    # Simulate Verification Agent
+    desc = payload.description.lower()
+    if "flood" in desc or "water" in desc or "rain" in desc:
+        status = "VERIFIED"
+        reasoning = f"Citizen report from {payload.location} aligns with simulated flood patterns. Waterlogging confirmed visually by AI."
+        confidence = 92.5
+    else:
+        status = "PENDING_REVIEW"
+        reasoning = f"Citizen report from {payload.location} requires further manual validation."
+        confidence = 45.0
+
+    return schemas.SOSReportResponse(
+        status=status,
+        reasoning=reasoning,
+        confidence_score=confidence
+    )

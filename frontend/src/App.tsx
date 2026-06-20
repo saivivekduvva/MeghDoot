@@ -7,6 +7,7 @@ import ScenarioSimulator from './pages/ScenarioSimulator';
 import RiskMapPage from './pages/RiskMapPage';
 import AgentIntelligence from './pages/AgentIntelligence';
 import MayorDashboard from './pages/MayorDashboard';
+import CitizenReports from './pages/CitizenReports';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             <Route path="/risk-map" element={<RiskMapPage />} />
             <Route path="/telemetry" element={<AgentIntelligence />} />
             <Route path="/mayor" element={<MayorDashboard />} />
+            <Route path="/citizen-reports" element={<CitizenReports />} />
           </Route>
         </Routes>
         <Toaster position="top-right" />
