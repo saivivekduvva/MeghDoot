@@ -1,6 +1,7 @@
 
 import { motion } from 'framer-motion';
 import { CloudRain, Waves, ThermometerSun, ShieldAlert, Navigation, Plus, Zap } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const agents = [
   { name: 'Weather Agent', status: 'active', icon: CloudRain, color: 'text-blue-400', bg: 'bg-blue-500/10' },
@@ -21,7 +22,7 @@ const RightSidebar = () => {
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
-      className="w-80 flex flex-col gap-6 ml-6"
+      className="w-80 flex flex-col gap-6 ml-6 shrink-0"
     >
       {/* AI Telemetry */}
       <div className="glass-panel p-6 flex-1">
@@ -80,7 +81,10 @@ const RightSidebar = () => {
                   <p className="text-xs text-slate-500 mt-0.5">{action.location}</p>
                 </div>
               </div>
-              <button className={`w-full py-2 rounded-xl text-xs font-semibold bg-${action.color}-500/10 text-${action.color}-600 hover:bg-${action.color}-500 hover:text-white transition-all duration-300`}>
+              <button 
+                onClick={() => toast.success(`Command Sent: ${action.title} initiated for ${action.location}!`)}
+                className={`w-full py-2 rounded-xl text-xs font-semibold bg-${action.color}-500/10 text-${action.color}-600 hover:bg-${action.color}-500 hover:text-white transition-all duration-300 cursor-pointer`}
+              >
                 Deploy Action
               </button>
             </motion.div>
@@ -92,3 +96,4 @@ const RightSidebar = () => {
 };
 
 export default RightSidebar;
+

@@ -11,7 +11,7 @@ const DashboardHeader = () => {
       className="flex justify-between items-center mb-8"
     >
       <div>
-        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Good morning, Commander</h1>
+        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Welcome, Commander</h1>
         <p className="text-slate-500 mt-1 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           System is monitoring 3 active risk scenarios
