@@ -20,19 +20,19 @@ const actions = [
 const RightSidebar = ({ onClose }: { onClose?: () => void }) => {
   return (
     <motion.div 
-      initial={{ opacity: 0, x: 350 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 350 }}
+      initial={{ opacity: 0, x: -350, width: 0 }}
+      animate={{ opacity: 1, x: 0, width: 320 }}
+      exit={{ opacity: 0, x: -350, width: 0 }}
       transition={{ duration: 0.4, type: "spring", bounce: 0 }}
-      className="absolute top-6 right-6 bottom-6 w-80 flex flex-col gap-6 z-50"
+      className="flex flex-col gap-6 z-40 shrink-0 overflow-y-auto custom-scrollbar pb-24"
     >
       {onClose && (
         <button 
           onClick={onClose}
-          className="absolute -left-14 top-4 p-3 bg-white text-slate-500 hover:text-slate-900 rounded-full shadow-2xl border border-slate-100 transition-all hover:scale-110 z-50"
+          className="absolute -right-4 top-4 p-2 bg-white text-slate-500 hover:text-slate-900 rounded-full shadow-md border border-slate-100 transition-all z-50"
           title="Close AI Panel"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
       )}
 

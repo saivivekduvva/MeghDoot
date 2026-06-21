@@ -1,5 +1,4 @@
-import Sidebar from './Sidebar';
-import DashboardHeader from './DashboardHeader';
+import TopNavbar from './TopNavbar';
 import RightSidebar from './RightSidebar';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useReport } from '../ReportContext';
@@ -8,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 
 const Layout = () => {
-  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
+  const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
   const { report } = useReport();
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,17 +18,18 @@ const Layout = () => {
   const showBottomBar = hasSimulationData && validPages.includes(location.pathname);
 
   return (
-    <div className="flex h-screen w-full p-6 overflow-hidden bg-slate-50 relative">
-      <Sidebar />
-      <div className="flex-1 flex flex-col h-full overflow-hidden relative">
-        <DashboardHeader toggleRightSidebar={() => setIsRightSidebarOpen(!isRightSidebarOpen)} />
-        <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+    <div className="flex flex-col h-screen w-full bg-slate-50 overflow-hidden font-sans">
+      <TopNavbar toggleLeftSidebar={() => setIsLeftSidebarOpen(!isLeftSidebarOpen)} />
+      
+      <div className="flex flex-1 overflow-hidden relative w-full px-8 py-6 gap-8">
+        <AnimatePresence>
+          {isLeftSidebarOpen && <RightSidebar onClose={() => setIsLeftSidebarOpen(false)} />}
+        </AnimatePresence>
+        
+        <div className="flex-1 overflow-y-auto custom-scrollbar pb-24 relative">
           <Outlet />
         </div>
       </div>
-      <AnimatePresence>
-        {isRightSidebarOpen && <RightSidebar onClose={() => setIsRightSidebarOpen(false)} />}
-      </AnimatePresence>
       
       <AnimatePresence>
         {showBottomBar && (
