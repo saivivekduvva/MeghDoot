@@ -1,5 +1,5 @@
 
-import { Home, CloudRain, AlertTriangle, Activity, Settings, Hexagon, ShieldCheck, Users } from 'lucide-react';
+import { Home, CloudRain, AlertTriangle, Activity, Settings, Hexagon, ShieldCheck, Users, Map } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useReport } from '../ReportContext';

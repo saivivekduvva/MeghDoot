@@ -3,7 +3,7 @@ import DashboardHeader from './DashboardHeader';
 import RightSidebar from './RightSidebar';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useReport } from '../ReportContext';
-import { Activity, ShieldCheck } from 'lucide-react';
+import { Activity, ShieldCheck, MapPinned } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 
@@ -13,6 +13,11 @@ const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const hasSimulationData = report.agent_reasoning && report.agent_reasoning.length > 0;
+  
+  // Only show the floating action bar on the main dashboard or simulator pages
+  const isMainPage = location.pathname === '/dashboard' || location.pathname === '/simulator';
+  const showBottomBar = hasSimulationData && isMainPage;
+
   return (
     <div className="flex h-screen w-full p-6 overflow-hidden bg-slate-50 relative">
       <Sidebar />
@@ -27,7 +32,7 @@ const Layout = () => {
       </AnimatePresence>
       
       <AnimatePresence>
-        {hasSimulationData && (
+        {showBottomBar && (
           <motion.div
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -56,6 +61,18 @@ const Layout = () => {
             >
               <ShieldCheck className="w-5 h-5" />
               Mayor's Action Plan
+            </button>
+            <div className="w-[1px] h-8 bg-slate-200"></div>
+            <button
+              onClick={() => navigate('/safe-route')}
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${
+                location.pathname === '/safe-route' 
+                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30 ring-2 ring-purple-600 ring-offset-2 ring-offset-slate-50' 
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+              }`}
+            >
+              <MapPinned className="w-5 h-5" />
+              Safe Route
             </button>
           </motion.div>
         )}

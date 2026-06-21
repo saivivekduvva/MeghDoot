@@ -8,6 +8,7 @@ import RiskMapPage from './pages/RiskMapPage';
 import AgentIntelligence from './pages/AgentIntelligence';
 import MayorDashboard from './pages/MayorDashboard';
 import CitizenReports from './pages/CitizenReports';
+import SafeRoute from './pages/SafeRoute';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route path="/telemetry" element={<AgentIntelligence />} />
             <Route path="/mayor" element={<MayorDashboard />} />
             <Route path="/citizen-reports" element={<CitizenReports />} />
+            <Route path="/safe-route" element={<SafeRoute />} />
           </Route>
         </Routes>
         <Toaster position="top-right" />
