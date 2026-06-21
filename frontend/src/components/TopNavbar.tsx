@@ -2,18 +2,40 @@ import { useState } from 'react';
 import { Home, CloudRain, AlertTriangle, Users, Map, Search, User, LogOut, Settings as SettingsIcon, UserCircle, PanelLeft, Info, X, Shield, Cpu, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useReport } from '../ReportContext';
 
 const TopNavbar = ({ toggleLeftSidebar }: { toggleLeftSidebar?: () => void }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { report } = useReport();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const hasSimulation = report.agent_reasoning && report.agent_reasoning.length > 0;
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      if (q.includes('map') || q.includes('risk')) navigate('/risk-map');
+      else if (q.includes('route') || q.includes('safe')) navigate('/safe-route');
+      else if (q.includes('sos') || q.includes('report') || q.includes('citizen')) navigate('/citizen-reports');
+      else if (q.includes('dashboard') || q.includes('mayor')) navigate('/dashboard');
+      else {
+        // Assume it's a new disaster description and jump to simulator
+        navigate('/simulator', { state: { prefill: searchQuery } });
+      }
+      setSearchQuery(''); // clear after search
+    }
+  };
 
   const navItems = [
-    { icon: Home, label: 'Dashboard', path: '/dashboard' },
+    ...(hasSimulation ? [{ icon: Home, label: 'Dashboard', path: '/dashboard' }] : []),
     { icon: CloudRain, label: 'Simulation', path: '/simulator' },
-    { icon: AlertTriangle, label: 'Risk Map', path: '/risk-map' },
-    { icon: Map, label: 'Safe Route', path: '/safe-route' },
+    ...(hasSimulation ? [
+      { icon: AlertTriangle, label: 'Risk Map', path: '/risk-map' },
+      { icon: Map, label: 'Safe Route', path: '/safe-route' }
+    ] : []),
     { icon: Users, label: 'Citizen SOS', path: '/citizen-reports' },
   ];
 
@@ -26,15 +48,22 @@ const TopNavbar = ({ toggleLeftSidebar }: { toggleLeftSidebar?: () => void }) =>
           
           {/* Left: Sidebar Toggle */}
           <div className="flex items-center">
-            <motion.button 
-              onClick={toggleLeftSidebar}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="p-2.5 bg-slate-100 rounded-xl text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-colors shadow-sm"
-              title="Toggle AI Telemetry Panel"
-            >
-              <PanelLeft className="w-6 h-6" />
-            </motion.button>
+            <AnimatePresence>
+              {hasSimulation && (
+                <motion.button 
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  onClick={toggleLeftSidebar}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="p-2.5 bg-slate-100 rounded-xl text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-colors shadow-sm"
+                  title="Toggle AI Telemetry Panel"
+                >
+                  <PanelLeft className="w-6 h-6" />
+                </motion.button>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Center: Massive Title */}
@@ -48,8 +77,11 @@ const TopNavbar = ({ toggleLeftSidebar }: { toggleLeftSidebar?: () => void }) =>
               <Search className="h-5 w-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearch}
                 className="bg-slate-100 border-none text-slate-700 text-sm rounded-full focus:ring-2 focus:ring-blue-500 block w-48 xl:w-64 pl-10 p-2.5 outline-none transition-all focus:w-72"
-                placeholder="Search scenarios..."
+                placeholder="Search scenarios or tools (Press Enter)..."
               />
             </div>
 

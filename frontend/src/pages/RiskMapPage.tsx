@@ -11,11 +11,16 @@ export default function RiskMapPage() {
   // Center on a dummy location (e.g., Mumbai coords for a typical Indian city hackathon context)
   const center: [number, number] = [19.0760, 72.8777];
 
+  // Safely extract metrics, defaulting to low values if no simulation has been run yet
+  const floodRisk = metrics?.flood_risk_pct || 15;
+  const heatRisk = metrics?.heatwave_risk_pct || 25;
+  const infraRisk = metrics?.infrastructure_stress_pct || 10;
+
   // Dummy zones based on the current risks
   const zones = [
-    { name: "Zone A (Lowlands)", pos: [19.08, 72.88] as [number, number], baseRisk: metrics.flood_risk_pct },
-    { name: "Zone B (Urban Core)", pos: [19.06, 72.87] as [number, number], baseRisk: metrics.heatwave_risk_pct },
-    { name: "Zone C (Industrial)", pos: [19.09, 72.89] as [number, number], baseRisk: metrics.infrastructure_stress_pct },
+    { name: "Zone A (Lowlands)", pos: [19.08, 72.88] as [number, number], baseRisk: floodRisk },
+    { name: "Zone B (Urban Core)", pos: [19.06, 72.87] as [number, number], baseRisk: heatRisk },
+    { name: "Zone C (Industrial)", pos: [19.09, 72.89] as [number, number], baseRisk: infraRisk },
   ];
 
   const getColorId = (risk: number) => {
