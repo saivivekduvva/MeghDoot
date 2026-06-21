@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ShieldAlert, MapPin, Camera, Send, CheckCircle2, AlertCircle, Hexagon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -24,7 +24,15 @@ const CitizenReports = () => {
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [reports, setReports] = useState<SubmittedReport[]>([]);
+  const [reports, setReports] = useState<SubmittedReport[]>(() => {
+    const saved = localStorage.getItem('meghdoot_sos_reports');
+    return saved ? JSON.parse(saved) : [];
+  });
+  
+  useEffect(() => {
+    localStorage.setItem('meghdoot_sos_reports', JSON.stringify(reports));
+  }, [reports]);
+
   const { setRescuedCount, resolvedReportIds, setResolvedReportIds } = useReport();
 
   const handleDispatch = (reportId: number) => {
