@@ -41,6 +41,50 @@ const MapBoundsUpdater = ({ start, end }: { start: [number, number], end: [numbe
   return null;
 };
 
+const DraggableHazard = ({ initialCenter, radius, label, onMove }: any) => {
+  const [position, setPosition] = useState(initialCenter);
+  // Update position if initialCenter changes (e.g. new route search)
+  useEffect(() => { setPosition(initialCenter); }, [initialCenter]);
+
+  const dragIcon = L.divIcon({
+    className: 'bg-transparent',
+    html: `<div class="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center border-2 border-white shadow shadow-red-500/50 text-white cursor-move opacity-70 hover:opacity-100 transition-opacity transform hover:scale-110">✥</div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+  });
+
+  return (
+    <>
+      <Marker 
+        position={position} 
+        draggable={true} 
+        icon={dragIcon}
+        eventHandlers={{
+          dragend: (e) => {
+            const marker = e.target;
+            const pos = marker.getLatLng();
+            const newPos = [pos.lat, pos.lng] as [number, number];
+            setPosition(newPos);
+            onMove(newPos);
+          },
+          drag: (e) => {
+            const marker = e.target;
+            const pos = marker.getLatLng();
+            setPosition([pos.lat, pos.lng]);
+          }
+        }}
+      >
+        <Popup>{label} (Draggable)</Popup>
+      </Marker>
+      <Circle 
+        center={position} 
+        radius={radius} 
+        pathOptions={{ fillColor: 'url(#hazardGlow)', fillOpacity: 1, color: 'transparent' }}
+      />
+    </>
+  );
+};
+
 export default function SafeRoute() {
   const [isRouting, setIsRouting] = useState(false);
   const [showRoute, setShowRoute] = useState(false);
@@ -54,6 +98,47 @@ export default function SafeRoute() {
   const [center, setCenter] = useState<[number, number]>([16.995, 82.02]);
   const [safeRoutePath, setSafeRoutePath] = useState<[number, number][]>([]);
 
+  const [hazards, setHazards] = useState([
+    { id: 1, center: [16.9891 + 0.02, 82.2475 + 0.02] as [number, number], radius: 2500, label: "Severe Waterlogging (1.5m)" },
+    { id: 2, center: [17.0005 - 0.02, 81.8040 - 0.02] as [number, number], radius: 3000, label: "Infrastructure Collapse Risk" },
+  ]);
+
+  const calculateRoute = (start: [number, number], end: [number, number], activeHazards: any[]) => {
+    // Generate base midpoints
+    let m1: [number, number] = [start[0] + (end[0]-start[0])*0.33, start[1] + (end[1]-start[1])*0.33];
+    let m2: [number, number] = [start[0] + (end[0]-start[0])*0.66, start[1] + (end[1]-start[1])*0.66];
+
+    // Simple repulsive force from hazards
+    activeHazards.forEach(h => {
+      const hLat = h.center[0];
+      const hLng = h.center[1];
+      
+      const pushAway = (pt: [number, number]) => {
+        // Roughly 1 degree is 111km. We want to avoid within ~4km radius (0.04 degrees)
+        const dist = Math.sqrt(Math.pow(pt[0]-hLat, 2) + Math.pow(pt[1]-hLng, 2));
+        if (dist < 0.05) { 
+          const pushFactor = (0.05 - dist) * 1.8;
+          const angle = Math.atan2(pt[0]-hLat, pt[1]-hLng);
+          return [pt[0] + Math.sin(angle)*pushFactor, pt[1] + Math.cos(angle)*pushFactor] as [number, number];
+        }
+        return pt;
+      };
+
+      m1 = pushAway(m1);
+      m2 = pushAway(m2);
+    });
+
+    setSafeRoutePath([start, m1, m2, end]);
+  };
+
+  const handleHazardMove = (id: number, newCenter: [number, number]) => {
+     setHazards(prev => {
+        const nextHazards = prev.map(h => h.id === id ? { ...h, center: newCenter } : h);
+        if (showRoute) calculateRoute(startPoint, endPoint, nextHazards);
+        return nextHazards;
+     });
+  };
+
   const handleMapClick = (latlng: any) => {
     const newPing = { id: Date.now(), pos: [latlng.lat, latlng.lng] as [number, number] };
     setPings(prev => [...prev, newPing]);
@@ -61,12 +146,6 @@ export default function SafeRoute() {
       setPings(prev => prev.filter(p => p.id !== newPing.id));
     }, 2000);
   };
-
-  // Example dummy coordinates for map hazards
-  const hazardZones = [
-    { center: [startPoint[0] + 0.02, startPoint[1] + 0.02] as [number, number], radius: 1200, label: "Severe Waterlogging (1.5m)" },
-    { center: [endPoint[0] - 0.02, endPoint[1] - 0.02] as [number, number], radius: 1500, label: "Infrastructure Collapse Risk" },
-  ];
 
   const geocode = async (query: string): Promise<[number, number] | null> => {
     try {
@@ -94,10 +173,12 @@ export default function SafeRoute() {
       setEndPoint(endCoords);
       setCenter([(startCoords[0] + endCoords[0]) / 2, (startCoords[1] + endCoords[1]) / 2]);
       
-      // Generate a dummy curved path connecting them to simulate a route
-      const midPoint1: [number, number] = [startCoords[0] + (endCoords[0]-startCoords[0])*0.3 + 0.02, startCoords[1] + (endCoords[1]-startCoords[1])*0.3];
-      const midPoint2: [number, number] = [startCoords[0] + (endCoords[0]-startCoords[0])*0.7 - 0.02, startCoords[1] + (endCoords[1]-startCoords[1])*0.7];
-      setSafeRoutePath([startCoords, midPoint1, midPoint2, endCoords]);
+      const newHazards = [
+        { id: 1, center: [startCoords[0] + 0.03, startCoords[1] + 0.03] as [number, number], radius: 2500, label: "Severe Waterlogging" },
+        { id: 2, center: [endCoords[0] - 0.03, endCoords[1] - 0.03] as [number, number], radius: 3000, label: "Collapse Risk" },
+      ];
+      setHazards(newHazards);
+      calculateRoute(startCoords, endCoords, newHazards);
     }
 
     setIsRouting(false);
@@ -109,8 +190,17 @@ export default function SafeRoute() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="h-full flex flex-col md:flex-row gap-6 p-2"
+      className="h-full flex flex-col md:flex-row gap-6 p-2 relative"
     >
+      <svg width="0" height="0" className="absolute">
+        <defs>
+          <radialGradient id="hazardGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#ef4444" stopOpacity="0.9"/>
+            <stop offset="40%" stopColor="#ef4444" stopOpacity="0.6"/>
+            <stop offset="100%" stopColor="#ef4444" stopOpacity="0.0"/>
+          </radialGradient>
+        </defs>
+      </svg>
       {/* Left Panel */}
       <div className="w-full md:w-96 flex flex-col gap-6 shrink-0">
         <div>
@@ -195,15 +285,14 @@ export default function SafeRoute() {
           ))}
 
           {/* Hazards */}
-          {hazardZones.map((zone, idx) => (
-            <Circle 
-              key={idx} 
-              center={zone.center} 
-              radius={zone.radius} 
-              pathOptions={{ color: 'red', fillColor: '#ef4444', fillOpacity: 0.25, weight: 2 }}
-            >
-              <Popup>{zone.label}</Popup>
-            </Circle>
+          {hazards.map((zone) => (
+            <DraggableHazard 
+              key={zone.id}
+              initialCenter={zone.center}
+              radius={zone.radius}
+              label={zone.label}
+              onMove={(newCenter: [number, number]) => handleHazardMove(zone.id, newCenter)}
+            />
           ))}
 
           {/* Route */}
