@@ -10,6 +10,8 @@ const TopNavbar = ({ toggleLeftSidebar }: { toggleLeftSidebar?: () => void }) =>
   const { report } = useReport();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const hasSimulation = report.agent_reasoning && report.agent_reasoning.length > 0;
@@ -73,28 +75,6 @@ const TopNavbar = ({ toggleLeftSidebar }: { toggleLeftSidebar?: () => void }) =>
 
           {/* Right: Search & Profile */}
           <div className="flex items-center gap-4">
-            <AnimatePresence>
-              {hasSimulation && (
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  onClick={() => {
-                    localStorage.removeItem('meghdoot_report');
-                    localStorage.removeItem('meghdoot_rescuedCount');
-                    localStorage.removeItem('meghdoot_resolvedReportIds');
-                    localStorage.removeItem('meghdoot_simulator_form');
-                    localStorage.removeItem('meghdoot_sos_reports');
-                    window.location.href = '/simulator';
-                  }}
-                  className="hidden md:flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-full font-bold text-sm transition-colors border border-red-200 hover:border-red-600 shadow-sm"
-                  title="End Simulation & Reset System"
-                >
-                  <AlertTriangle className="w-4 h-4" />
-                  Reset System
-                </motion.button>
-              )}
-            </AnimatePresence>
 
             <div className="relative hidden lg:block">
               <Search className="h-5 w-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -140,8 +120,8 @@ const TopNavbar = ({ toggleLeftSidebar }: { toggleLeftSidebar?: () => void }) =>
                       <p className="text-sm font-bold text-slate-800">Commander Admin</p>
                       <p className="text-xs font-medium text-slate-500 mt-0.5">admin@meghdoot.gov</p>
                     </div>
-                    <button className="w-full px-4 py-2.5 text-left text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-blue-600 flex items-center gap-2"><UserCircle className="w-4 h-4" /> My Profile</button>
-                    <button className="w-full px-4 py-2.5 text-left text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-blue-600 flex items-center gap-2"><SettingsIcon className="w-4 h-4" /> Settings</button>
+                    <button onClick={() => { setIsProfileOpen(false); setIsProfileModalOpen(true); }} className="w-full px-4 py-2.5 text-left text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-blue-600 flex items-center gap-2"><UserCircle className="w-4 h-4" /> My Profile</button>
+                    <button onClick={() => { setIsProfileOpen(false); setIsSettingsOpen(true); }} className="w-full px-4 py-2.5 text-left text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-blue-600 flex items-center gap-2"><SettingsIcon className="w-4 h-4" /> Settings</button>
                     <div className="border-t border-slate-50 mt-1 pt-1">
                       <button className="w-full px-4 py-2.5 text-left text-sm font-bold text-red-500 hover:bg-red-50 flex items-center gap-2"><LogOut className="w-4 h-4" /> Sign Out</button>
                     </div>
@@ -247,6 +227,122 @@ const TopNavbar = ({ toggleLeftSidebar }: { toggleLeftSidebar?: () => void }) =>
                   <div className="text-sm text-slate-400 font-medium">
                     System Version 2.0.4
                   </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Settings Modal */}
+      <AnimatePresence>
+        {isSettingsOpen && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-auto">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsSettingsOpen(false)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-[90%] max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
+            >
+              <button 
+                onClick={() => setIsSettingsOpen(false)}
+                className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors z-10"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              
+              <div className="bg-slate-50 p-8 border-b border-slate-100">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center shadow-lg">
+                    <SettingsIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">System Settings</h2>
+                    <p className="text-slate-500 font-medium text-sm mt-1">Manage application preferences</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-8 space-y-6">
+                <div>
+                  <h3 className="font-bold text-slate-800 mb-2">Danger Zone</h3>
+                  <div className="p-4 border border-red-200 bg-red-50 rounded-xl flex items-center justify-between">
+                    <div>
+                      <p className="font-bold text-red-700 text-sm">Reset Simulation Data</p>
+                      <p className="text-xs text-red-500 font-medium">Wipes all current state and caches.</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        localStorage.removeItem('meghdoot_report');
+                        localStorage.removeItem('meghdoot_rescuedCount');
+                        localStorage.removeItem('meghdoot_resolvedReportIds');
+                        localStorage.removeItem('meghdoot_simulator_form');
+                        localStorage.removeItem('meghdoot_sos_reports');
+                        window.location.href = '/simulator';
+                      }}
+                      className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg font-bold text-sm transition-colors shadow-sm"
+                    >
+                      <AlertTriangle className="w-4 h-4" /> Reset System
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Profile Modal */}
+      <AnimatePresence>
+        {isProfileModalOpen && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-auto">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsProfileModalOpen(false)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-[90%] max-w-sm bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col items-center p-8 text-center"
+            >
+              <button 
+                onClick={() => setIsProfileModalOpen(false)}
+                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors z-10"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 p-1 shadow-lg mb-4">
+                <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
+                  <User className="w-10 h-10 text-slate-600" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-black text-slate-800 tracking-tight">Commander Admin</h2>
+              <p className="text-blue-600 font-bold tracking-widest uppercase mt-1 text-xs mb-6">Disaster Response Team</p>
+
+              <div className="w-full bg-slate-50 p-4 rounded-xl border border-slate-100 text-left space-y-3">
+                <div>
+                  <p className="text-xs font-bold text-slate-400 uppercase">Email</p>
+                  <p className="text-sm font-semibold text-slate-700">admin@meghdoot.gov</p>
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-400 uppercase">Clearance Level</p>
+                  <p className="text-sm font-semibold text-slate-700">Top Secret (Level 5)</p>
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-400 uppercase">Role</p>
+                  <p className="text-sm font-semibold text-slate-700">System Administrator</p>
                 </div>
               </div>
             </motion.div>
