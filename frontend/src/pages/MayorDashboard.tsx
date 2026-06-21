@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useReport } from '../ReportContext';
-import { ShieldCheck, ArrowDownRight, AlertOctagon, Coins, Wrench, TrendingDown, Zap, PieChart, HeartHandshake } from 'lucide-react';
+import { ShieldCheck, ArrowDownRight, AlertOctagon, Coins, Wrench, TrendingDown, Zap, PieChart, HeartHandshake, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
 import CountUp from '../components/CountUp';
 
@@ -73,9 +73,18 @@ export default function MayorDashboard() {
           <h2 className="text-3xl font-bold text-slate-800">Executive Action Plan</h2>
           <p className="text-slate-500 mt-2">Prioritized recommendations coordinated by the Mayor Agent.</p>
         </div>
-        <div className="text-right">
-          <p className="text-sm text-slate-500 uppercase tracking-widest font-semibold">Affected Pop.</p>
-          <p className="text-2xl font-bold text-red-600"><CountUp end={metrics.affected_population} duration={1.5} /></p>
+        <div className="flex items-center gap-8">
+          <button 
+            onClick={() => window.print()}
+            className="hidden md:flex items-center gap-2 px-5 py-2.5 bg-slate-800 text-white hover:bg-slate-700 rounded-xl font-bold text-sm transition-colors shadow-sm print:hidden"
+            title="Export as PDF Document"
+          >
+            <Download className="w-4 h-4" /> Export Briefing
+          </button>
+          <div className="text-right">
+            <p className="text-sm text-slate-500 uppercase tracking-widest font-semibold">Affected Pop.</p>
+            <p className="text-2xl font-bold text-red-600"><CountUp end={metrics.affected_population} duration={1.5} /></p>
+          </div>
         </div>
       </header>
 

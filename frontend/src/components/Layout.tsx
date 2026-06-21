@@ -23,7 +23,7 @@ const Layout = () => {
       
       <div className="flex flex-1 overflow-hidden relative w-full px-8 py-6 gap-8">
         <AnimatePresence>
-          {isLeftSidebarOpen && <RightSidebar onClose={() => setIsLeftSidebarOpen(false)} />}
+          {isLeftSidebarOpen && <RightSidebar className="print:hidden" onClose={() => setIsLeftSidebarOpen(false)} />}
         </AnimatePresence>
         
         <div className="flex-1 overflow-y-auto custom-scrollbar pb-24 relative">
@@ -37,7 +37,7 @@ const Layout = () => {
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.9 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-white/90 backdrop-blur-xl p-3 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-200/60 z-50"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-white/90 backdrop-blur-xl p-3 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-200/60 z-50 print:hidden"
           >
             <button
               onClick={() => navigate('/telemetry')}

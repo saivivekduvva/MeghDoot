@@ -41,7 +41,7 @@ const TopNavbar = ({ toggleLeftSidebar }: { toggleLeftSidebar?: () => void }) =>
 
   return (
     <>
-      <div className="w-full bg-white/90 backdrop-blur-xl border-b border-slate-200 shadow-sm z-40 relative flex-shrink-0">
+      <div className="w-full bg-white/90 backdrop-blur-xl border-b border-slate-200 shadow-sm z-40 relative flex-shrink-0 print:hidden">
         <div className="w-full px-8">
         {/* Top Row: Title & Actions */}
         <div className="flex justify-between items-center py-6">
