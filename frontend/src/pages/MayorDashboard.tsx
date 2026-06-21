@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useReport } from '../ReportContext';
-import { ShieldCheck, ArrowDownRight, AlertOctagon, Coins, Wrench, TrendingDown, Zap, PieChart } from 'lucide-react';
+import { ShieldCheck, ArrowDownRight, AlertOctagon, Coins, Wrench, TrendingDown, Zap, PieChart, HeartHandshake } from 'lucide-react';
 import { motion } from 'framer-motion';
 import CountUp from '../components/CountUp';
 
@@ -24,7 +24,7 @@ const itemVariants = {
 };
 
 export default function MayorDashboard() {
-  const { report } = useReport();
+  const { report, rescuedCount } = useReport();
   const { recommended_actions, expected_impact_reduction, metrics, recovery_suggestions } = report;
   const [activeTab, setActiveTab] = useState<'immediate' | 'recovery'>('immediate');
 
@@ -162,6 +162,27 @@ export default function MayorDashboard() {
 
         {/* Right Sidebar Stats Area */}
         <div className="space-y-6">
+          
+          {rescuedCount > 0 && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring", bounce: 0.5 }}
+              className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-lg shadow-emerald-500/20"
+            >
+              <h3 className="text-lg font-bold mb-1 flex items-center gap-2">
+                <HeartHandshake className="w-6 h-6" /> Live Rescue Operations
+              </h3>
+              <p className="text-emerald-100 text-sm mb-4 font-medium">Citizens secured via SOS dispatch</p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-6xl font-black tracking-tighter drop-shadow-sm">
+                  <CountUp end={rescuedCount} duration={2} />
+                </p>
+                <p className="text-emerald-200 font-bold uppercase tracking-wider text-sm">Rescued</p>
+              </div>
+            </motion.div>
+          )}
+
           <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-lg">
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
               <ArrowDownRight className="w-5 h-5" /> Expected Impact Reduction

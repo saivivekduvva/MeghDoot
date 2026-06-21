@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ShieldAlert, MapPin, Camera, Send, CheckCircle2, AlertCircle, Hexagon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useReport } from '../ReportContext';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
@@ -24,6 +25,15 @@ const CitizenReports = () => {
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reports, setReports] = useState<SubmittedReport[]>([]);
+  const { setRescuedCount, resolvedReportIds, setResolvedReportIds } = useReport();
+
+  const handleDispatch = (reportId: number) => {
+    if (resolvedReportIds.includes(reportId)) return;
+    setResolvedReportIds((prev) => [...prev, reportId]);
+    const rescuedAmount = Math.floor(Math.random() * 11) + 5; // random between 5 and 15
+    setRescuedCount((prev) => prev + rescuedAmount);
+    toast.success(`Rescue Unit Dispatched! Approx ${rescuedAmount} citizens secured.`);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,33 +150,60 @@ const CitizenReports = () => {
                   <p>No active reports.<br/>New SOS requests will appear here after AI verification.</p>
                 </div>
               ) : (
-                reports.map((report) => (
-                  <motion.div
-                    key={report.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="p-4 bg-white/80 rounded-xl border border-slate-100 shadow-sm"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-bold text-slate-900">{report.location}</h3>
-                      <span className="text-xs font-semibold px-2 py-1 bg-green-100 text-green-700 rounded-full">
-                        {report.response?.status}
-                      </span>
-                    </div>
-                    <p className="text-sm text-slate-600 mb-3">"{report.description}"</p>
-                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Hexagon className="w-4 h-4 text-indigo-500" />
-                        <span className="text-xs font-bold text-indigo-700">AI Verification Agent</span>
-                        <span className="text-xs text-slate-400 ml-auto">{report.timestamp}</span>
+                reports.map((report) => {
+                  const isResolved = resolvedReportIds.includes(report.id);
+                  return (
+                    <motion.div
+                      key={report.id}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className={`p-4 rounded-xl border shadow-sm transition-all duration-500 ${isResolved ? 'bg-emerald-50/80 border-emerald-200' : 'bg-white/80 border-slate-100'}`}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className={`font-bold ${isResolved ? 'text-emerald-900' : 'text-slate-900'}`}>{report.location}</h3>
+                        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${isResolved ? 'bg-emerald-200 text-emerald-800' : 'bg-green-100 text-green-700'}`}>
+                          {isResolved ? 'RESOLVED' : report.response?.status}
+                        </span>
                       </div>
-                      <p className="text-sm font-medium text-slate-700">{report.response?.reasoning}</p>
-                      <div className="mt-2 text-xs font-semibold text-slate-500">
-                        Confidence Score: <span className="text-indigo-600">{report.response?.confidence_score}%</span>
+                      <p className={`text-sm mb-3 ${isResolved ? 'text-emerald-700' : 'text-slate-600'}`}>"{report.description}"</p>
+                      <div className={`p-3 rounded-lg border ${isResolved ? 'bg-emerald-100/50 border-emerald-200' : 'bg-slate-50 border-slate-100'}`}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <Hexagon className={`w-4 h-4 ${isResolved ? 'text-emerald-600' : 'text-indigo-500'}`} />
+                          <span className={`text-xs font-bold ${isResolved ? 'text-emerald-800' : 'text-indigo-700'}`}>AI Verification Agent</span>
+                          <span className="text-xs text-slate-400 ml-auto">{report.timestamp}</span>
+                        </div>
+                        <p className={`text-sm font-medium ${isResolved ? 'text-emerald-800' : 'text-slate-700'}`}>{report.response?.reasoning}</p>
+                        <div className="mt-2 text-xs font-semibold text-slate-500">
+                          Confidence Score: <span className={isResolved ? 'text-emerald-700' : 'text-indigo-600'}>{report.response?.confidence_score}%</span>
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                ))
+                      
+                      <div className={`mt-4 pt-4 border-t ${isResolved ? 'border-emerald-200/60' : 'border-slate-100'}`}>
+                        <button
+                          onClick={() => handleDispatch(report.id)}
+                          disabled={isResolved}
+                          className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+                            isResolved 
+                              ? 'bg-emerald-200/50 text-emerald-700 cursor-not-allowed' 
+                              : 'bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 text-blue-700 shadow-sm border border-blue-200 hover:border-blue-300'
+                          }`}
+                        >
+                          {isResolved ? (
+                            <>
+                              <CheckCircle2 className="w-5 h-5" />
+                              Rescue Unit Dispatched
+                            </>
+                          ) : (
+                            <>
+                              <ShieldAlert className="w-5 h-5" />
+                              Dispatch Rescue Unit
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                })
               )}
             </div>
           </div>

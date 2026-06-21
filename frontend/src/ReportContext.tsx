@@ -23,6 +23,10 @@ interface ReportContextType {
   setReport: (r: CityRiskReport) => void;
   isLoading: boolean;
   setIsLoading: (v: boolean) => void;
+  rescuedCount: number;
+  setRescuedCount: (v: number | ((prev: number) => number)) => void;
+  resolvedReportIds: number[];
+  setResolvedReportIds: (v: number[] | ((prev: number[]) => number[])) => void;
 }
 
 const ReportContext = createContext<ReportContextType | undefined>(undefined);
@@ -33,13 +37,34 @@ export function ReportProvider({ children }: { children: React.ReactNode }) {
     return saved ? JSON.parse(saved) : defaultReport;
   });
   const [isLoading, setIsLoading] = useState(false);
+  
+  const [rescuedCount, setRescuedCount] = useState<number>(() => {
+    const saved = localStorage.getItem('meghdoot_rescuedCount');
+    return saved ? JSON.parse(saved) : 0;
+  });
+
+  const [resolvedReportIds, setResolvedReportIds] = useState<number[]>(() => {
+    const saved = localStorage.getItem('meghdoot_resolvedReportIds');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   useEffect(() => {
     localStorage.setItem('meghdoot_report', JSON.stringify(report));
   }, [report]);
 
+  useEffect(() => {
+    localStorage.setItem('meghdoot_rescuedCount', JSON.stringify(rescuedCount));
+  }, [rescuedCount]);
+
+  useEffect(() => {
+    localStorage.setItem('meghdoot_resolvedReportIds', JSON.stringify(resolvedReportIds));
+  }, [resolvedReportIds]);
+
   return (
-    <ReportContext.Provider value={{ report, setReport, isLoading, setIsLoading }}>
+    <ReportContext.Provider value={{ 
+      report, setReport, isLoading, setIsLoading,
+      rescuedCount, setRescuedCount, resolvedReportIds, setResolvedReportIds 
+    }}>
       {children}
     </ReportContext.Provider>
   );

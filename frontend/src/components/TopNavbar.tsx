@@ -81,6 +81,8 @@ const TopNavbar = ({ toggleLeftSidebar }: { toggleLeftSidebar?: () => void }) =>
                   exit={{ opacity: 0, scale: 0.8 }}
                   onClick={() => {
                     localStorage.removeItem('meghdoot_report');
+                    localStorage.removeItem('meghdoot_rescuedCount');
+                    localStorage.removeItem('meghdoot_resolvedReportIds');
                     window.location.href = '/simulator';
                   }}
                   className="hidden md:flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-full font-bold text-sm transition-colors border border-red-200 hover:border-red-600 shadow-sm"
