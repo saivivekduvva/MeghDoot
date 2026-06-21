@@ -14,9 +14,9 @@ const Layout = () => {
   const location = useLocation();
   const hasSimulationData = report.agent_reasoning && report.agent_reasoning.length > 0;
   
-  // Only show the floating action bar on the main dashboard or simulator pages
-  const isMainPage = location.pathname === '/dashboard' || location.pathname === '/simulator';
-  const showBottomBar = hasSimulationData && isMainPage;
+  // Only show the floating action bar on relevant simulation-related pages
+  const validPages = ['/dashboard', '/simulator', '/telemetry', '/mayor', '/safe-route'];
+  const showBottomBar = hasSimulationData && validPages.includes(location.pathname);
 
   return (
     <div className="flex h-screen w-full p-6 overflow-hidden bg-slate-50 relative">

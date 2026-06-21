@@ -9,6 +9,9 @@ class ScenarioInput(BaseModel):
     reservoir_capacity_pct: float
     population_density_multiplier: float = 1.0
 
+class NLParseInput(BaseModel):
+    text: str
+
 # Base Agent Output
 class AgentAnalysis(BaseModel):
     agent_name: str

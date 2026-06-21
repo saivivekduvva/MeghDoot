@@ -4,11 +4,63 @@ from database import get_db, engine, Base
 import models
 import schemas
 from agents.graph import agent_executor
+from agents.nodes import llm
+from langchain_core.prompts import ChatPromptTemplate
+import os
+import json
 
 # Create tables if not exist (SQLite specific ease)
 Base.metadata.create_all(bind=engine)
 
 router = APIRouter()
+
+@router.post("/parse-nl", response_model=schemas.ScenarioInput)
+async def parse_nl_scenario(payload: schemas.NLParseInput):
+    text = payload.text
+    try:
+        if not os.environ.get("GOOGLE_API_KEY") or "your_google_api_key" in os.environ.get("GOOGLE_API_KEY", ""):
+            raise ValueError("Placeholder API key")
+            
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", """You are a natural language parser for a disaster simulation engine.
+Extract these four parameters from the user's text and output ONLY valid JSON format:
+{{
+  "rainfall_mm": (float, e.g., 0 for dry, 150 for heavy rain),
+  "temperature_c": (float, e.g., 30 for normal, 45 for heatwave),
+  "reservoir_capacity_pct": (float, 0-120),
+  "population_density_multiplier": (float, 0.5-2.5)
+}}
+If the text lacks specific numbers, make a highly educated guess based on the description (e.g. "heavy rain" -> 150, "very hot" -> 42)."""),
+            ("user", "Text: {text}")
+        ])
+        
+        chain = prompt | llm
+        response = chain.invoke({"text": text}).content
+        
+        if response.startswith("```json"):
+            response = response.replace("```json", "").replace("```", "").strip()
+        elif response.startswith("```"):
+            response = response.replace("```", "").strip()
+            
+        data = json.loads(response)
+        return schemas.ScenarioInput(
+            rainfall_mm=float(data.get("rainfall_mm", 120)),
+            temperature_c=float(data.get("temperature_c", 35)),
+            reservoir_capacity_pct=float(data.get("reservoir_capacity_pct", 50)),
+            population_density_multiplier=float(data.get("population_density_multiplier", 1.0))
+        )
+    except Exception as e:
+        print(f"[NL Parse] Fallback due to error: {e}")
+        text_lower = text.lower()
+        r = 200 if "rain" in text_lower or "flood" in text_lower else 0
+        t = 45 if "hot" in text_lower or "heat" in text_lower else 30
+        res = 100 if "lake" in text_lower or "full" in text_lower or "overflow" in text_lower else 40
+        return schemas.ScenarioInput(
+            rainfall_mm=r,
+            temperature_c=t,
+            reservoir_capacity_pct=res,
+            population_density_multiplier=1.0
+        )
 
 @router.post("/simulate-scenario", response_model=schemas.CityRiskReport)
 async def simulate_scenario(payload: schemas.ScenarioInput, db: Session = Depends(get_db)):
