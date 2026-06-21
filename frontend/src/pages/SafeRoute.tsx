@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, Circle, Popup, useMapEvents, CircleMarker } from 'react-leaflet';
+import { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Polyline, Circle, Popup, useMapEvents, CircleMarker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin, Navigation2, Search, AlertOctagon } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -30,10 +30,29 @@ const MapClickHandler = ({ onMapClick }: { onMapClick: (latlng: any) => void }) 
   return null;
 };
 
+const MapBoundsUpdater = ({ start, end }: { start: [number, number], end: [number, number] }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (start && end) {
+      const bounds = L.latLngBounds([start, end]);
+      map.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }, [start, end, map]);
+  return null;
+};
+
 export default function SafeRoute() {
   const [isRouting, setIsRouting] = useState(false);
   const [showRoute, setShowRoute] = useState(false);
   const [pings, setPings] = useState<{ id: number, pos: [number, number] }[]>([]);
+
+  const [sourceInput, setSourceInput] = useState('Kakinada');
+  const [destInput, setDestInput] = useState('Rajahmundry');
+  
+  const [startPoint, setStartPoint] = useState<[number, number]>([16.9891, 82.2475]); // Default Kakinada
+  const [endPoint, setEndPoint] = useState<[number, number]>([17.0005, 81.8040]);     // Default Rajahmundry
+  const [center, setCenter] = useState<[number, number]>([16.995, 82.02]);
+  const [safeRoutePath, setSafeRoutePath] = useState<[number, number][]>([]);
 
   const handleMapClick = (latlng: any) => {
     const newPing = { id: Date.now(), pos: [latlng.lat, latlng.lng] as [number, number] };
@@ -43,33 +62,46 @@ export default function SafeRoute() {
     }, 2000);
   };
 
-  const center: [number, number] = [19.0760, 72.8777]; // Mumbai, matching Risk Map
-  
-  // Example dummy coordinates for map (Mumbai)
+  // Example dummy coordinates for map hazards
   const hazardZones = [
-    { center: [19.08, 72.88] as [number, number], radius: 1200, label: "Severe Waterlogging (1.5m)" },
-    { center: [19.06, 72.87] as [number, number], radius: 1500, label: "Infrastructure Collapse Risk" },
+    { center: [startPoint[0] + 0.02, startPoint[1] + 0.02] as [number, number], radius: 1200, label: "Severe Waterlogging (1.5m)" },
+    { center: [endPoint[0] - 0.02, endPoint[1] - 0.02] as [number, number], radius: 1500, label: "Infrastructure Collapse Risk" },
   ];
 
-  const startPoint: [number, number] = [19.04, 72.85];
-  const endPoint: [number, number] = [19.10, 72.90];
+  const geocode = async (query: string): Promise<[number, number] | null> => {
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+      const data = await res.json();
+      if (data && data.length > 0) {
+        return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+      }
+    } catch (e) {
+      console.error("Geocoding failed", e);
+    }
+    return null;
+  };
 
-  const safeRoutePath: [number, number][] = [
-    startPoint,
-    [19.045, 72.865],
-    [19.045, 72.880],
-    [19.070, 72.910],
-    [19.090, 72.905],
-    endPoint
-  ];
-
-  const handleRouteSearch = () => {
+  const handleRouteSearch = async () => {
     setIsRouting(true);
     setShowRoute(false);
-    setTimeout(() => {
-      setIsRouting(false);
-      setShowRoute(true);
-    }, 1500);
+    
+    // Fetch real coordinates
+    const startCoords = await geocode(sourceInput);
+    const endCoords = await geocode(destInput);
+
+    if (startCoords && endCoords) {
+      setStartPoint(startCoords);
+      setEndPoint(endCoords);
+      setCenter([(startCoords[0] + endCoords[0]) / 2, (startCoords[1] + endCoords[1]) / 2]);
+      
+      // Generate a dummy curved path connecting them to simulate a route
+      const midPoint1: [number, number] = [startCoords[0] + (endCoords[0]-startCoords[0])*0.3 + 0.02, startCoords[1] + (endCoords[1]-startCoords[1])*0.3];
+      const midPoint2: [number, number] = [startCoords[0] + (endCoords[0]-startCoords[0])*0.7 - 0.02, startCoords[1] + (endCoords[1]-startCoords[1])*0.7];
+      setSafeRoutePath([startCoords, midPoint1, midPoint2, endCoords]);
+    }
+
+    setIsRouting(false);
+    setShowRoute(true);
   };
 
   return (
@@ -92,7 +124,8 @@ export default function SafeRoute() {
               <div className="absolute top-3 left-3 text-emerald-500">
                 <MapPin className="w-5 h-5" />
               </div>
-              <input type="text" placeholder="Current Location" defaultValue="Chhatrapati Shivaji Terminus"
+              <input type="text" placeholder="Current Location" 
+                value={sourceInput} onChange={(e) => setSourceInput(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-slate-700" />
             </div>
             
@@ -100,7 +133,8 @@ export default function SafeRoute() {
               <div className="absolute top-3 left-3 text-red-500">
                 <MapPin className="w-5 h-5" />
               </div>
-              <input type="text" placeholder="Destination" defaultValue="Relief Camp Sector 4 (Andheri)"
+              <input type="text" placeholder="Destination" 
+                value={destInput} onChange={(e) => setDestInput(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-slate-700" />
             </div>
 
@@ -146,6 +180,8 @@ export default function SafeRoute() {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           
+          
+          {showRoute && <MapBoundsUpdater start={startPoint} end={endPoint} />}
           <MapClickHandler onMapClick={handleMapClick} />
           
           {/* Ripple Pings */}
