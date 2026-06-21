@@ -118,7 +118,8 @@ async def simulate_scenario(payload: schemas.ScenarioInput, db: Session = Depend
         agent_reasoning=agent_reasoning,
         recommended_actions=actions,
         expected_impact_reduction=mayor_report.get("expected_impact_reduction", {}),
-        relief_allocations=allocations
+        relief_allocations=allocations,
+        recovery_suggestions=mayor_report.get("recovery_suggestions", [])
     )
     
     # Normally we'd save the outputs back to models.RiskAssessment and models.AgentOutput

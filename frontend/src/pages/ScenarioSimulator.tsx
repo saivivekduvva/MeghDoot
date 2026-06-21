@@ -7,6 +7,75 @@ import { motion } from 'framer-motion';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
+const AgentTerminalFeed = () => {
+  const [logs, setLogs] = useState<string[]>([]);
+
+  useEffect(() => {
+    const sequence = [
+      "Initializing LangChain multi-agent framework...",
+      "Weather Agent: Ingesting meteorological telemetry...",
+      "Flood Agent: Calculating topographical inundation depths...",
+      "Power Grid Agent: Analyzing infrastructure stress points...",
+      "Economics Agent: Estimating asset damage and loss...",
+      "Evacuation Agent: Identifying safe routes and relief camps...",
+      "Synthesizing intelligence into Mayor's Action Plan...",
+      "Awaiting final LLM consensus..."
+    ];
+
+    let i = 0;
+    setLogs([sequence[0]]);
+    i++;
+
+    const interval = setInterval(() => {
+      if (i < sequence.length) {
+        setLogs(prev => [...prev, sequence[i]]);
+        i++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      className="bg-white rounded-3xl p-8 shadow-2xl border border-blue-50/50 min-h-[400px] w-full relative overflow-hidden flex flex-col items-center py-12"
+    >
+      <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500"></div>
+      
+      <div className="flex flex-col items-center mb-8">
+        <div className="relative w-20 h-20 mb-6">
+           <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 4, ease: "linear" }} className="absolute inset-0 rounded-full border-t-2 border-blue-500 border-r-2 border-transparent opacity-70"></motion.div>
+           <motion.div animate={{ rotate: -360 }} transition={{ repeat: Infinity, duration: 6, ease: "linear" }} className="absolute inset-2 rounded-full border-l-2 border-indigo-400 border-b-2 border-transparent opacity-70"></motion.div>
+           <motion.div animate={{ scale: [0.9, 1.1, 0.9] }} transition={{ repeat: Infinity, duration: 2 }} className="absolute inset-0 flex items-center justify-center">
+             <Bot className="w-8 h-8 text-blue-600" />
+           </motion.div>
+        </div>
+        <h3 className="text-2xl font-black text-slate-800 tracking-tight">AI Agents Processing</h3>
+        <p className="text-sm font-medium text-slate-500 mt-2">Running real-time scenario simulation...</p>
+      </div>
+
+      <div className="w-full max-w-lg space-y-3 relative z-10 flex flex-col items-center">
+          {logs.map((log, idx) => (
+            <motion.div 
+              key={idx}
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className="flex items-center gap-3 w-full bg-slate-50/80 backdrop-blur-sm border border-slate-200/60 py-3 px-5 rounded-2xl shadow-sm"
+            >
+              <div className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse flex-shrink-0 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div>
+              <span className="text-slate-700 font-semibold text-sm">{log}</span>
+            </motion.div>
+          ))}
+      </div>
+    </motion.div>
+  );
+};
+
 export default function ScenarioSimulator() {
   const { setReport, isLoading, setIsLoading } = useReport();
   const navigate = useNavigate();
@@ -144,7 +213,11 @@ export default function ScenarioSimulator() {
 
       <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
         
-        {/* Mode Selector */}
+        {isLoading ? (
+          <AgentTerminalFeed />
+        ) : (
+          <>
+            {/* Mode Selector */}
         <div className="flex bg-slate-100 p-1 rounded-xl mb-8">
           <button
             onClick={() => setInputMode('text')}
@@ -295,6 +368,8 @@ export default function ScenarioSimulator() {
             {isLoading ? 'Agents Analyzing...' : 'Run Scenario'}
           </button>
         </div>
+          </>
+        )}
       </div>
     </motion.div>
   );
