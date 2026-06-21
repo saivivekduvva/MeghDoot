@@ -149,7 +149,8 @@ export default function SafeRoute() {
 
   const geocode = async (query: string): Promise<[number, number] | null> => {
     try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+      // Bounded to roughly the Andhra Pradesh / Telangana region
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&viewbox=77.0,19.5,84.5,13.0&bounded=1`);
       const data = await res.json();
       if (data && data.length > 0) {
         return [parseFloat(data[0].lat), parseFloat(data[0].lon)];

@@ -41,7 +41,7 @@ const TopNavbar = ({ toggleLeftSidebar }: { toggleLeftSidebar?: () => void }) =>
 
   return (
     <>
-      <div className="w-full bg-white/90 backdrop-blur-xl border-b border-slate-200 shadow-sm z-40 relative flex-shrink-0 print:hidden">
+      <div className="w-full bg-white/90 backdrop-blur-xl border-b border-slate-200 shadow-sm z-[1000] relative flex-shrink-0 print:hidden">
         <div className="w-full px-8">
         {/* Top Row: Title & Actions */}
         <div className="flex justify-between items-center py-6">
@@ -132,7 +132,7 @@ const TopNavbar = ({ toggleLeftSidebar }: { toggleLeftSidebar?: () => void }) =>
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 overflow-hidden"
+                    className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-[9999] overflow-hidden"
                   >
                     <div className="px-4 py-3 border-b border-slate-50 mb-1">
                       <p className="text-sm font-bold text-slate-800">Commander Admin</p>

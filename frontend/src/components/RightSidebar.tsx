@@ -1,4 +1,4 @@
-
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CloudRain, Waves, ThermometerSun, ShieldAlert, Navigation, Plus, Zap, X, PieChart } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -18,6 +18,8 @@ const actions = [
 ];
 
 const RightSidebar = ({ onClose, className = '' }: { onClose?: () => void, className?: string }) => {
+  const [deployedActions, setDeployedActions] = useState<number[]>([]);
+
   return (
     <motion.div 
       initial={{ opacity: 0, x: -350 }}
@@ -94,10 +96,20 @@ const RightSidebar = ({ onClose, className = '' }: { onClose?: () => void, class
                 </div>
               </div>
               <button 
-                onClick={() => toast.success(`Command Sent: ${action.title} initiated for ${action.location}!`)}
-                className={`w-full py-2 rounded-xl text-xs font-semibold bg-${action.color}-500/10 text-${action.color}-600 hover:bg-${action.color}-500 hover:text-white transition-all duration-300 cursor-pointer`}
+                onClick={() => {
+                  if (!deployedActions.includes(action.id)) {
+                    setDeployedActions(prev => [...prev, action.id]);
+                    toast.success(`Command Sent: ${action.title} initiated for ${action.location}!`);
+                  }
+                }}
+                disabled={deployedActions.includes(action.id)}
+                className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
+                  deployedActions.includes(action.id)
+                    ? 'bg-emerald-100 text-emerald-700 cursor-not-allowed border border-emerald-200'
+                    : `bg-${action.color}-500/10 text-${action.color}-600 hover:bg-${action.color}-500 hover:text-white cursor-pointer`
+                }`}
               >
-                Deploy Action
+                {deployedActions.includes(action.id) ? 'Action Deployed ✓' : 'Deploy Action'}
               </button>
             </motion.div>
           ))}

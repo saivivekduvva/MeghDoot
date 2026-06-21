@@ -58,7 +58,7 @@ const AgentTerminalFeed = () => {
         <p className="text-sm font-medium text-slate-500 mt-2">Running real-time scenario simulation...</p>
       </div>
 
-      <div className="w-full max-w-lg space-y-3 relative z-10 flex flex-col items-center">
+      <div className="w-full max-w-lg space-y-3 relative z-10 flex flex-col items-center h-64 overflow-y-auto custom-scrollbar pr-2">
           {logs.map((log, idx) => (
             <motion.div 
               key={idx}
