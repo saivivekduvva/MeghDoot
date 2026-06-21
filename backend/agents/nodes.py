@@ -152,6 +152,9 @@ def run_mayor_agent(state: AgentState) -> Dict[str, Any]:
   "hospital_demand_increase_pct": 10.0,
   "relief_allocations": [
     {{"category": "Crop Subsidies", "amount_crores": 2.5}}
+  ],
+  "recovery_suggestions": [
+    {{"original_asset": "Asphalt Highway", "upgrade_suggestion": "Permeable asphalt with raised culverts", "upgrade_cost_crores": 7.5, "risk_reduction_pct": 40}}
   ]
 }}
 Base your numbers on the input risks:
@@ -207,6 +210,20 @@ Weather: {w}%, Flood: {f}%, Infrastructure: {i}%, Economic: {e}%
                 {"category": "Infrastructure Repair", "amount_crores": round(econ_loss * 0.4, 2)},
                 {"category": "Crop Subsidies", "amount_crores": round(econ_loss * 0.35, 2)},
                 {"category": "Emergency Medical Funds", "amount_crores": round(econ_loss * 0.25, 2)}
+            ],
+            "recovery_suggestions": [
+                {
+                    "original_asset": "Standard Asphalt Roads (Zone A)", 
+                    "upgrade_suggestion": "Permeable interlocking concrete pavements to reduce surface runoff", 
+                    "upgrade_cost_crores": round(econ_loss * 0.15, 2), 
+                    "risk_reduction_pct": 35
+                },
+                {
+                    "original_asset": "Overhead Power Lines", 
+                    "upgrade_suggestion": "Underground utility routing in high-risk flood corridors", 
+                    "upgrade_cost_crores": round(econ_loss * 0.22, 2), 
+                    "risk_reduction_pct": 60
+                }
             ]
         }
         

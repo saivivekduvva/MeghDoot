@@ -37,6 +37,12 @@ class ReliefAllocation(BaseModel):
     category: str
     amount_crores: float
 
+class RecoverySuggestion(BaseModel):
+    original_asset: str
+    upgrade_suggestion: str
+    upgrade_cost_crores: float
+    risk_reduction_pct: int
+
 # Expected output format for the API response
 class CityRiskReport(BaseModel):
     metrics: RiskMetrics
@@ -44,6 +50,7 @@ class CityRiskReport(BaseModel):
     recommended_actions: List[ActionRecommendation]
     expected_impact_reduction: dict
     relief_allocations: List[ReliefAllocation]
+    recovery_suggestions: List[RecoverySuggestion]
 
 # Citizen SOS reporting models
 class SOSReportInput(BaseModel):

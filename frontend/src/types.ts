@@ -29,10 +29,18 @@ export interface ReliefAllocation {
   amount_crores: number;
 }
 
+export interface RecoverySuggestion {
+  original_asset: string;
+  upgrade_suggestion: string;
+  upgrade_cost_crores: number;
+  risk_reduction_pct: number;
+}
+
 export interface CityRiskReport {
   metrics: RiskMetrics;
   agent_reasoning: AgentAnalysis[];
   recommended_actions: ActionRecommendation[];
   expected_impact_reduction: ExpectedImpactReduction;
   relief_allocations: ReliefAllocation[];
+  recovery_suggestions?: RecoverySuggestion[];
 }
