@@ -23,6 +23,7 @@ class RiskMetrics(BaseModel):
     heatwave_risk_pct: float
     water_scarcity_risk_pct: float
     infrastructure_stress_pct: float
+    power_risk_pct: float
     affected_population: int
     economic_loss_estimate: float
     hospital_demand_increase_pct: float

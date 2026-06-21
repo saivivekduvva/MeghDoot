@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+
 export default function ScenarioSimulator() {
   const { setReport, isLoading, setIsLoading } = useReport();
   const navigate = useNavigate();
@@ -80,7 +82,7 @@ export default function ScenarioSimulator() {
     setIsLoading(true);
     const toastId = toast.loading('Agents analyzing scenario...');
     try {
-      const response = await fetch('http://127.0.0.1:8000/simulate-scenario', {
+      const response = await fetch(`${API_URL}/simulate-scenario`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -106,7 +108,7 @@ export default function ScenarioSimulator() {
     setIsAnalyzing(true);
     const toastId = toast.loading('AI analyzing text...');
     try {
-      const response = await fetch('http://127.0.0.1:8000/parse-nl', {
+      const response = await fetch(`${API_URL}/parse-nl`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: nlText })

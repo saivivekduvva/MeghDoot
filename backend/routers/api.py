@@ -93,8 +93,9 @@ async def simulate_scenario(payload: schemas.ScenarioInput, db: Session = Depend
     metrics = schemas.RiskMetrics(
         flood_risk_pct=final_state.get("flood_risk", 0.0),
         heatwave_risk_pct=final_state.get("weather_risk", 0.0),
-        water_scarcity_risk_pct=0.0, # Placeholder for now
+        water_scarcity_risk_pct=max(0.0, 100.0 - payload.reservoir_capacity_pct), 
         infrastructure_stress_pct=final_state.get("infrastructure_risk", 0.0),
+        power_risk_pct=final_state.get("power_risk", 0.0),
         affected_population=mayor_report.get("affected_population", 0),
         economic_loss_estimate=mayor_report.get("economic_loss_estimate", 0.0),
         hospital_demand_increase_pct=mayor_report.get("hospital_demand_increase_pct", 0.0),
@@ -125,10 +126,6 @@ async def simulate_scenario(payload: schemas.ScenarioInput, db: Session = Depend
     
     return report
 
-@router.get("/city-report")
-async def get_city_report():
-    # Placeholder for getting the latest report
-    return {"message": "Use /simulate-scenario to generate a new report."}
 
 @router.post("/sos-report", response_model=schemas.SOSReportResponse)
 async def process_sos_report(payload: schemas.SOSReportInput):

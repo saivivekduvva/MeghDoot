@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShieldAlert, MapPin, Camera, Send, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ShieldAlert, MapPin, Camera, Send, CheckCircle2, AlertCircle, Hexagon } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
 interface ReportResponse {
   status: string;
@@ -32,7 +34,7 @@ const CitizenReports = () => {
 
     setIsSubmitting(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/sos-report', {
+      const res = await fetch(`${API_URL}/sos-report`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ location, description }),
