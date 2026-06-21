@@ -56,6 +56,15 @@ The project consists of a Python FastAPI backend (powering the AI Agents via Lan
    ```
 4. Open the local URL provided by Vite (usually `http://localhost:5173`) in your browser to see the MeghDoot Command Center!
 
-## Recent UI Updates
-- **Light Theme**: The UI is currently styled in a premium "light-glass" theme using Tailwind v4.
-- **Components**: The Dashboard includes `StatCards`, `ScenariosTable`, and a `RightSidebar` with pulsing AI agent telemetries and actionable risk items.
+## Key Features Built for the Hackathon
+
+- **Mayor's Dashboard:** Features dynamic `CountUp` metric cards, an interactive Relief Allocator, Live Rescue Operation tracking, and a 1-click **Export Briefing to PDF** function that dynamically hides non-essential UI via `@media print`.
+- **Scenario Simulator:** A beautiful glassmorphic control center featuring a "Live Agent Terminal" loading screen. Includes an **NLP Input Mode** that uses Gemini to extract sliders (Rainfall, Temp, etc.) directly from plain English disaster descriptions.
+- **Citizen SOS Portal:** Simulates real-time civilian SOS reports that are passed through a LangChain Verification Agent. Features an interactive **"Dispatch Rescue Unit"** gameplay loop that directly increments the Mayor's Dashboard counters.
+- **Floating Agent Telemetry:** A persistent right-sidebar overlay that floats gracefully over the map (preventing layout shifts) and displays individual agent intelligence and interactive "Deploy Action" commands.
+- **Safe Route Mapping:** Utilizes Leaflet, Nominatim bounded-geocoding, and a custom pathfinding algorithm to route citizens away from draggable AI-identified disaster hazard zones.
+- **Robust Local Persistence:** Simulation state, Citizen Reports, and form configurations are cached securely via `localStorage` to survive page reloads, with a dedicated "Reset System" button hidden securely in the TopNav Settings Modal.
+
+## UI / UX Architecture
+- **Tech Stack:** React, Vite, Tailwind CSS v4, Framer Motion, Recharts, and React-Leaflet.
+- **Aesthetics:** Uses a premium "light-glass" theme featuring high-contrast text, smooth layout animations (`<AnimatePresence>`), dynamic scrollbars, and `z-[9999]` layered modals to ensure map components never swallow dropdowns.
