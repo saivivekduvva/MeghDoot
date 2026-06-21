@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Home, CloudRain, AlertTriangle, Users, Map, Search, Bell, User, LogOut, Settings as SettingsIcon, UserCircle, PanelLeft } from 'lucide-react';
+import { Home, CloudRain, AlertTriangle, Users, Map, Search, User, LogOut, Settings as SettingsIcon, UserCircle, PanelLeft, Info, X, Shield, Cpu, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -7,6 +7,7 @@ const TopNavbar = ({ toggleLeftSidebar }: { toggleLeftSidebar?: () => void }) =>
   const navigate = useNavigate();
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
 
   const navItems = [
     { icon: Home, label: 'Dashboard', path: '/dashboard' },
@@ -17,8 +18,9 @@ const TopNavbar = ({ toggleLeftSidebar }: { toggleLeftSidebar?: () => void }) =>
   ];
 
   return (
-    <div className="w-full bg-white/90 backdrop-blur-xl border-b border-slate-200 shadow-sm z-40 relative flex-shrink-0">
-      <div className="w-full px-8">
+    <>
+      <div className="w-full bg-white/90 backdrop-blur-xl border-b border-slate-200 shadow-sm z-40 relative flex-shrink-0">
+        <div className="w-full px-8">
         {/* Top Row: Title & Actions */}
         <div className="flex justify-between items-center py-6">
           
@@ -51,9 +53,13 @@ const TopNavbar = ({ toggleLeftSidebar }: { toggleLeftSidebar?: () => void }) =>
               />
             </div>
 
-            <motion.button whileHover={{ scale: 1.05 }} className="relative p-2.5 bg-slate-100 rounded-full text-slate-600 hover:text-slate-900 shadow-sm">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+            <motion.button 
+              onClick={() => setIsAboutOpen(true)}
+              whileHover={{ scale: 1.05 }} 
+              className="relative p-2.5 bg-slate-100 rounded-full text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-colors shadow-sm"
+              title="About MeghDoot"
+            >
+              <Info className="w-5 h-5" />
             </motion.button>
 
             <div className="relative">
@@ -113,8 +119,86 @@ const TopNavbar = ({ toggleLeftSidebar }: { toggleLeftSidebar?: () => void }) =>
             );
           })}
         </nav>
+        </div>
       </div>
-    </div>
+
+      {/* About Modal */}
+      <AnimatePresence>
+        {isAboutOpen && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-auto">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsAboutOpen(false)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-[90%] max-w-3xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
+            >
+              <button 
+                onClick={() => setIsAboutOpen(false)}
+                className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors z-10"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              
+              <div className="bg-slate-50 p-8 border-b border-slate-100">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <CloudRain className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-4xl font-black text-slate-800 tracking-tight">MeghDoot</h2>
+                    <p className="text-blue-600 font-bold tracking-widest uppercase mt-1">Multi-Agent Climate Intelligence Command Center</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-8 space-y-6">
+                <p className="text-slate-600 leading-relaxed text-lg text-justify font-medium">
+                  Designed to predict, simulate, and mitigate severe environmental disasters, MeghDoot bridges the gap between predictive intelligence and rapid real-world execution.
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                  <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Cpu className="w-5 h-5 text-indigo-600" />
+                      <h3 className="font-bold text-slate-800">Autonomous Architecture</h3>
+                    </div>
+                    <p className="text-sm text-slate-600 leading-relaxed">
+                      Powered by Google Gemini and LangChain, the platform coordinates specialized AI agents (Weather, Flood, Power Grid, Economics, and Evacuation) running real-time parallel risk simulations.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Activity className="w-5 h-5 text-emerald-600" />
+                      <h3 className="font-bold text-slate-800">Live Mitigation</h3>
+                    </div>
+                    <p className="text-sm text-slate-600 leading-relaxed">
+                      Our premium dashboard aggregates agent outputs into live telemetries, presenting critical recommendations. Operators can instantly authorize emergency relief measures directly from the interface.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="pt-4 mt-6 border-t border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm text-slate-500 font-medium">
+                    <Shield className="w-4 h-4 text-blue-500" /> Authorized Government Use Only
+                  </div>
+                  <div className="text-sm text-slate-400 font-medium">
+                    System Version 2.0.4
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
