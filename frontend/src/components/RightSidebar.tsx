@@ -17,14 +17,14 @@ const actions = [
   { id: 3, title: 'Medical Supply Drop', location: 'Sector 4', priority: 'MEDIUM', icon: Plus, color: 'blue' },
 ];
 
-const RightSidebar = ({ onClose }: { onClose?: () => void }) => {
+const RightSidebar = ({ onClose, className = '' }: { onClose?: () => void, className?: string }) => {
   return (
     <motion.div 
-      initial={{ opacity: 0, x: -350, width: 0 }}
-      animate={{ opacity: 1, x: 0, width: 320 }}
-      exit={{ opacity: 0, x: -350, width: 0 }}
+      initial={{ opacity: 0, x: -350 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -350 }}
       transition={{ duration: 0.4, type: "spring", bounce: 0 }}
-      className="flex flex-col gap-6 z-40 shrink-0 overflow-y-auto custom-scrollbar pb-24"
+      className={`absolute left-8 top-6 bottom-6 w-80 flex flex-col gap-6 z-50 shrink-0 overflow-y-auto custom-scrollbar ${className}`}
     >
       {onClose && (
         <button 
