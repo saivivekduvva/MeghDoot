@@ -73,6 +73,25 @@ const TopNavbar = ({ toggleLeftSidebar }: { toggleLeftSidebar?: () => void }) =>
 
           {/* Right: Search & Profile */}
           <div className="flex items-center gap-4">
+            <AnimatePresence>
+              {hasSimulation && (
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  onClick={() => {
+                    localStorage.removeItem('meghdoot_report');
+                    window.location.href = '/simulator';
+                  }}
+                  className="hidden md:flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-full font-bold text-sm transition-colors border border-red-200 hover:border-red-600 shadow-sm"
+                  title="End Simulation & Reset System"
+                >
+                  <AlertTriangle className="w-4 h-4" />
+                  Reset System
+                </motion.button>
+              )}
+            </AnimatePresence>
+
             <div className="relative hidden lg:block">
               <Search className="h-5 w-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
