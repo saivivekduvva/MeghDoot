@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useReport } from '../ReportContext';
-import { ShieldCheck, ArrowDownRight, AlertOctagon, Coins, Wrench, TrendingDown, Zap } from 'lucide-react';
+import { ShieldCheck, ArrowDownRight, AlertOctagon, Coins, Wrench, TrendingDown, Zap, PieChart } from 'lucide-react';
 import { motion } from 'framer-motion';
+import CountUp from '../components/CountUp';
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -27,6 +28,30 @@ export default function MayorDashboard() {
   const { recommended_actions, expected_impact_reduction, metrics, recovery_suggestions } = report;
   const [activeTab, setActiveTab] = useState<'immediate' | 'recovery'>('immediate');
 
+  // Budget Mini-Game State
+  const [budgetMed, setBudgetMed] = useState(33);
+  const [budgetInf, setBudgetInf] = useState(33);
+  const [budgetEvac, setBudgetEvac] = useState(34);
+
+  const handleBudgetChange = (type: string, value: number) => {
+    const diff = value - (type === 'med' ? budgetMed : type === 'inf' ? budgetInf : budgetEvac);
+    if (type === 'med') {
+      setBudgetMed(value);
+      setBudgetInf(Math.max(0, budgetInf - diff / 2));
+      setBudgetEvac(Math.max(0, budgetEvac - diff / 2));
+    } else if (type === 'inf') {
+      setBudgetInf(value);
+      setBudgetMed(Math.max(0, budgetMed - diff / 2));
+      setBudgetEvac(Math.max(0, budgetEvac - diff / 2));
+    } else {
+      setBudgetEvac(value);
+      setBudgetMed(Math.max(0, budgetMed - diff / 2));
+      setBudgetInf(Math.max(0, budgetInf - diff / 2));
+    }
+  };
+
+  const recoverySpeed = Math.min(100, Math.max(10, (budgetMed * 0.8) + (budgetInf * 1.2) + (budgetEvac * 0.9)));
+
   if (!recommended_actions || recommended_actions.length === 0) {
     return (
       <motion.div 
@@ -41,7 +66,7 @@ export default function MayorDashboard() {
   return (
     <motion.div 
       initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
-      className="p-8 max-w-5xl mx-auto space-y-8"
+      className="p-8 max-w-7xl mx-auto space-y-8 pb-32"
     >
       <header className="mb-8 flex justify-between items-end">
         <div>
@@ -50,7 +75,7 @@ export default function MayorDashboard() {
         </div>
         <div className="text-right">
           <p className="text-sm text-slate-500 uppercase tracking-widest font-semibold">Affected Pop.</p>
-          <p className="text-2xl font-bold text-red-600">{metrics.affected_population.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-red-600"><CountUp end={metrics.affected_population} duration={1.5} /></p>
         </div>
       </header>
 
@@ -69,7 +94,7 @@ export default function MayorDashboard() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
         
         {/* Main Content Area */}
         <motion.div variants={listVariants} initial="hidden" animate="show" className="col-span-2 space-y-4">
@@ -144,11 +169,15 @@ export default function MayorDashboard() {
             <div className="space-y-4">
               <div>
                 <p className="text-blue-200 text-sm">Flood Exposure</p>
-                <p className="text-3xl font-bold">-{expected_impact_reduction?.flood_exposure_reduced_pct || 0}%</p>
+                <p className="text-3xl font-bold">
+                  -<CountUp end={expected_impact_reduction?.flood_exposure_reduced_pct || 0} suffix="%" />
+                </p>
               </div>
               <div>
                 <p className="text-blue-200 text-sm">Economic Loss</p>
-                <p className="text-3xl font-bold">-{expected_impact_reduction?.economic_loss_reduced_pct || 0}%</p>
+                <p className="text-3xl font-bold">
+                  -<CountUp end={expected_impact_reduction?.economic_loss_reduced_pct || 0} suffix="%" />
+                </p>
               </div>
             </div>
           </div>
@@ -158,7 +187,9 @@ export default function MayorDashboard() {
               <AlertOctagon className="w-6 h-6 text-orange-600 shrink-0" />
               <div>
                 <h4 className="font-bold text-orange-800">Est. Economic Loss</h4>
-                <p className="text-orange-900 mt-1 font-semibold text-xl">₹{metrics.economic_loss_estimate.toFixed(2)} Crores</p>
+                <p className="text-orange-900 mt-1 font-semibold text-xl">
+                  <CountUp prefix="₹" end={metrics.economic_loss_estimate} decimals={2} suffix=" Crores" />
+                </p>
               </div>
             </div>
           </div>
@@ -182,6 +213,50 @@ export default function MayorDashboard() {
               )}
             </div>
           </div>
+
+          {/* Interactive Budget Balancer */}
+          <div className="bg-white border border-slate-200 p-5 rounded-xl shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <PieChart className="w-5 h-5 text-indigo-600" />
+              <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wide">Interactive Budget Allocator</h4>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between text-xs font-bold text-slate-500 mb-1">
+                  <span>Medical & Rescue</span>
+                  <span>{Math.round(budgetMed)}%</span>
+                </div>
+                <input type="range" min="0" max="100" value={budgetMed} onChange={(e) => handleBudgetChange('med', parseInt(e.target.value))} className="w-full accent-rose-500" />
+              </div>
+              <div>
+                <div className="flex justify-between text-xs font-bold text-slate-500 mb-1">
+                  <span>Infrastructure Repair</span>
+                  <span>{Math.round(budgetInf)}%</span>
+                </div>
+                <input type="range" min="0" max="100" value={budgetInf} onChange={(e) => handleBudgetChange('inf', parseInt(e.target.value))} className="w-full accent-amber-500" />
+              </div>
+              <div>
+                <div className="flex justify-between text-xs font-bold text-slate-500 mb-1">
+                  <span>Evacuation & Camps</span>
+                  <span>{Math.round(budgetEvac)}%</span>
+                </div>
+                <input type="range" min="0" max="100" value={budgetEvac} onChange={(e) => handleBudgetChange('evac', parseInt(e.target.value))} className="w-full accent-blue-500" />
+              </div>
+            </div>
+
+            <div className="mt-5 pt-4 border-t border-slate-100">
+              <p className="text-xs font-bold text-slate-500 uppercase mb-2">Projected Recovery Speed</p>
+              <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                <motion.div 
+                  className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-2.5 rounded-full" 
+                  animate={{ width: `${recoverySpeed}%` }}
+                  transition={{ type: 'spring', bounce: 0.4 }}
+                ></motion.div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </motion.div>

@@ -2,7 +2,7 @@ import TopNavbar from './TopNavbar';
 import RightSidebar from './RightSidebar';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useReport } from '../ReportContext';
-import { Activity, ShieldCheck, MapPinned } from 'lucide-react';
+import { Activity, ShieldCheck, MapPinned, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 

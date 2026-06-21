@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, Circle, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Polyline, Circle, Popup, useMapEvents, CircleMarker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin, Navigation2, Search, AlertOctagon } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -21,9 +21,27 @@ const endIcon = L.divIcon({
   iconAnchor: [16, 16],
 });
 
+const MapClickHandler = ({ onMapClick }: { onMapClick: (latlng: any) => void }) => {
+  useMapEvents({
+    click(e) {
+      onMapClick(e.latlng);
+    },
+  });
+  return null;
+};
+
 export default function SafeRoute() {
   const [isRouting, setIsRouting] = useState(false);
   const [showRoute, setShowRoute] = useState(false);
+  const [pings, setPings] = useState<{ id: number, pos: [number, number] }[]>([]);
+
+  const handleMapClick = (latlng: any) => {
+    const newPing = { id: Date.now(), pos: [latlng.lat, latlng.lng] as [number, number] };
+    setPings(prev => [...prev, newPing]);
+    setTimeout(() => {
+      setPings(prev => prev.filter(p => p.id !== newPing.id));
+    }, 2000);
+  };
 
   const center: [number, number] = [19.0760, 72.8777]; // Mumbai, matching Risk Map
   
@@ -128,6 +146,18 @@ export default function SafeRoute() {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           
+          <MapClickHandler onMapClick={handleMapClick} />
+          
+          {/* Ripple Pings */}
+          {pings.map((ping) => (
+            <CircleMarker 
+              key={ping.id} 
+              center={ping.pos} 
+              radius={20} 
+              pathOptions={{ color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.6, className: 'animate-ping' }} 
+            />
+          ))}
+
           {/* Hazards */}
           {hazardZones.map((zone, idx) => (
             <Circle 
