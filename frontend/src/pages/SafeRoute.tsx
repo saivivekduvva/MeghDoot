@@ -4,38 +4,44 @@ import 'leaflet/dist/leaflet.css';
 import { MapPin, Navigation2, Search, AlertOctagon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-// Fix for default marker icons in react-leaflet
+// Fix for default marker icons by using custom divIcons
 import L from 'leaflet';
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconAnchor: [12, 41]
+
+const startIcon = L.divIcon({
+  className: 'bg-transparent',
+  html: `<div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center border-4 border-white shadow-lg text-white font-bold text-xs">S</div>`,
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
 });
-L.Marker.prototype.options.icon = DefaultIcon;
+
+const endIcon = L.divIcon({
+  className: 'bg-transparent',
+  html: `<div class="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center border-4 border-white shadow-lg text-white font-bold text-xs">D</div>`,
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
+});
 
 export default function SafeRoute() {
   const [isRouting, setIsRouting] = useState(false);
   const [showRoute, setShowRoute] = useState(false);
 
-  const center: [number, number] = [22.5726, 88.3639]; // Example: Kolkata
+  const center: [number, number] = [19.0760, 72.8777]; // Mumbai, matching Risk Map
   
-  // Example dummy coordinates for map
+  // Example dummy coordinates for map (Mumbai)
   const hazardZones = [
-    { center: [22.57, 88.36] as [number, number], radius: 1200, label: "Severe Waterlogging (1.5m)" },
-    { center: [22.59, 88.39] as [number, number], radius: 1500, label: "Infrastructure Collapse Risk" },
+    { center: [19.08, 72.88] as [number, number], radius: 1200, label: "Severe Waterlogging (1.5m)" },
+    { center: [19.06, 72.87] as [number, number], radius: 1500, label: "Infrastructure Collapse Risk" },
   ];
 
-  const startPoint: [number, number] = [22.55, 88.34];
-  const endPoint: [number, number] = [22.61, 88.42];
+  const startPoint: [number, number] = [19.04, 72.85];
+  const endPoint: [number, number] = [19.10, 72.90];
 
   const safeRoutePath: [number, number][] = [
     startPoint,
-    [22.545, 88.355],
-    [22.545, 88.380],
-    [22.560, 88.420],
-    [22.590, 88.430],
+    [19.045, 72.865],
+    [19.045, 72.880],
+    [19.070, 72.910],
+    [19.090, 72.905],
     endPoint
   ];
 
@@ -68,7 +74,7 @@ export default function SafeRoute() {
               <div className="absolute top-3 left-3 text-emerald-500">
                 <MapPin className="w-5 h-5" />
               </div>
-              <input type="text" placeholder="Current Location" defaultValue="Central Station"
+              <input type="text" placeholder="Current Location" defaultValue="Chhatrapati Shivaji Terminus"
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-slate-700" />
             </div>
             
@@ -76,7 +82,7 @@ export default function SafeRoute() {
               <div className="absolute top-3 left-3 text-red-500">
                 <MapPin className="w-5 h-5" />
               </div>
-              <input type="text" placeholder="Destination" defaultValue="Relief Camp Sector 4"
+              <input type="text" placeholder="Destination" defaultValue="Relief Camp Sector 4 (Andheri)"
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-slate-700" />
             </div>
 
@@ -137,8 +143,8 @@ export default function SafeRoute() {
           {/* Route */}
           {showRoute && (
             <>
-              <Marker position={startPoint}><Popup>Start Location</Popup></Marker>
-              <Marker position={endPoint}><Popup>Safe Destination</Popup></Marker>
+              <Marker position={startPoint} icon={startIcon}><Popup>Start Location</Popup></Marker>
+              <Marker position={endPoint} icon={endIcon}><Popup>Safe Destination</Popup></Marker>
               <Polyline 
                 positions={safeRoutePath} 
                 pathOptions={{ color: '#2563eb', weight: 5, opacity: 0.9 }} 
